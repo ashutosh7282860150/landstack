@@ -1,0 +1,167 @@
+[
+  {
+    "id": "AUD-234576",
+    "timestamp": "2026-09-11 06:13:42",
+    "actorRole": "Citizen / Payment Gateway",
+    "actorName": "Unified Payments Interface (UPI)",
+    "action": "PROPERTY_TAX_PAYMENT_SETTLED",
+    "ulpin": "IN-RJ-JAI-2024-031204",
+    "ipAddress": "115.110.45.12",
+    "hash": "amcr40qwx3d",
+    "details": "Online property tax settled for ₹ 4800. Receipt generated: REC-TAX-2026-538348"
+  },
+  {
+    "id": "AUD-898594",
+    "timestamp": "2026-09-11 06:13:42",
+    "actorRole": "Revenue Officer (Patwari)",
+    "actorName": "Anand S. Kulkarni (Patwari Hinjawadi)",
+    "action": "WORKFLOW_STAGE_ADVANCED_2",
+    "ulpin": "IN-MH-PUN-2024-009871",
+    "ipAddress": "10.14.90.12",
+    "hash": "5u2f40jsvz6",
+    "details": "Revenue Officer (Patwari) approved stage for application APP-2026-MUT-8454. Remarks: Verified boundary stone #4 on ground via DGPS survey"
+  },
+  {
+    "id": "AUD-390473",
+    "timestamp": "2026-09-11 06:13:42",
+    "actorRole": "Citizen User",
+    "actorName": "Rameshwar D. Patil",
+    "action": "ONLINE_MUTATION_FILED",
+    "ulpin": "IN-MH-PUN-2024-009871",
+    "ipAddress": "157.34.12.99",
+    "hash": "4dert78lmddjfkrjpbtdjs",
+    "details": "Filed Mutation application (ID: APP-2026-MUT-8454) for ULPIN: IN-MH-PUN-2024-009871"
+  },
+  {
+    "id": "AUD-287600",
+    "timestamp": "2026-09-11 06:09:16",
+    "actorRole": "Citizen / Payment Gateway",
+    "actorName": "Unified Payments Interface (UPI)",
+    "action": "PROPERTY_TAX_PAYMENT_SETTLED",
+    "ulpin": "IN-RJ-JAI-2024-031204",
+    "ipAddress": "115.110.45.12",
+    "hash": "5jhkx3ibe08",
+    "details": "Online property tax settled for ₹ 4800. Receipt generated: REC-TAX-2026-583848"
+  },
+  {
+    "id": "AUD-230541",
+    "timestamp": "2026-09-11 06:09:16",
+    "actorRole": "Revenue Officer (Patwari)",
+    "actorName": "Anand S. Kulkarni (Patwari Hinjawadi)",
+    "action": "WORKFLOW_STAGE_ADVANCED_2",
+    "ulpin": "IN-MH-PUN-2024-009871",
+    "ipAddress": "10.14.90.12",
+    "hash": "f8jfdznzo7v",
+    "details": "Revenue Officer (Patwari) approved stage for application APP-2026-MUT-2923. Remarks: Verified boundary stone #4 on ground via DGPS survey"
+  },
+  {
+    "id": "AUD-530566",
+    "timestamp": "2026-09-11 06:09:16",
+    "actorRole": "Citizen User",
+    "actorName": "Rameshwar D. Patil",
+    "action": "ONLINE_MUTATION_FILED",
+    "ulpin": "IN-MH-PUN-2024-009871",
+    "ipAddress": "157.34.12.99",
+    "hash": "0cdjyaj2ju3l0zp3nsn45r",
+    "details": "Filed Mutation application (ID: APP-2026-MUT-2923) for ULPIN: IN-MH-PUN-2024-009871"
+  },
+  {
+    "id": "AUD-718353",
+    "timestamp": "2026-09-10 17:44:47",
+    "actorRole": "Citizen User",
+    "actorName": "rahul",
+    "action": "ONLINE_MUTATION_FILED",
+    "ulpin": "IN-TG-HYD-2024-041829",
+    "ipAddress": "157.34.12.99",
+    "hash": "02k63bzg7b1yx6xr4kg4kq",
+    "details": "Filed Mutation / Khata Transfer application (ID: APP-2026-MUT-4914) for ULPIN: IN-TG-HYD-2024-041829"
+  },
+  {
+    "id": "AUD-505696",
+    "timestamp": "2026-09-10 17:41:06",
+    "actorRole": "Citizen User",
+    "actorName": "sujit",
+    "action": "ONLINE_MUTATION_FILED",
+    "ulpin": "IN-TG-HYD-2024-041829",
+    "ipAddress": "157.34.12.99",
+    "hash": "pc764nd4e2y4h1xqdbis",
+    "details": "Filed Mutation / Khata Transfer application (ID: APP-2026-MUT-5013) for ULPIN: IN-TG-HYD-2024-041829"
+  },
+  {
+    "id": "AUD-133777",
+    "timestamp": "2026-09-10 16:53:15",
+    "actorRole": "Citizen / Payment Gateway",
+    "actorName": "Unified Payments Interface (UPI)",
+    "action": "PROPERTY_TAX_PAYMENT_SETTLED",
+    "ulpin": "IN-RJ-JAI-2024-031204",
+    "ipAddress": "115.110.45.12",
+    "hash": "haafjt197i",
+    "details": "Online property tax settled for ₹ 4800. Receipt generated: REC-TAX-2026-870150"
+  },
+  {
+    "id": "AUD-679682",
+    "timestamp": "2026-09-10 16:53:15",
+    "actorRole": "Revenue Officer (Patwari)",
+    "actorName": "Anand S. Kulkarni (Patwari Hinjawadi)",
+    "action": "WORKFLOW_STAGE_ADVANCED_2",
+    "ulpin": "IN-MH-PUN-2024-009871",
+    "ipAddress": "10.14.90.12",
+    "hash": "m1g3yaa9zik",
+    "details": "Revenue Officer (Patwari) approved stage for application APP-2026-MUT-4415. Remarks: Verified boundary stone #4 on ground via DGPS survey"
+  },
+  {
+    "id": "AUD-420273",
+    "timestamp": "2026-09-10 16:53:15",
+    "actorRole": "Citizen User",
+    "actorName": "Rameshwar D. Patil",
+    "action": "ONLINE_MUTATION_FILED",
+    "ulpin": "IN-MH-PUN-2024-009871",
+    "ipAddress": "157.34.12.99",
+    "hash": "y5qtb5l0cehinhxs7gdyme",
+    "details": "Filed Mutation application (ID: APP-2026-MUT-4415) for ULPIN: IN-MH-PUN-2024-009871"
+  },
+  {
+    "id": "AUD-991204",
+    "timestamp": "2026-09-10 18:30:12",
+    "actorRole": "Revenue Officer (Patwari)",
+    "actorName": "Anand S. Kulkarni",
+    "action": "GIS_FIELD_SURVEY_VERIFIED",
+    "ulpin": "IN-MH-PUN-2024-009871",
+    "ipAddress": "10.24.110.42",
+    "hash": "8f39a01bce29408e01824a7bc91024",
+    "details": "Verified DGPS coordinates of boundary stone #4 on Western edge."
+  },
+  {
+    "id": "AUD-991203",
+    "timestamp": "2026-09-10 16:14:05",
+    "actorRole": "Registration Officer (Sub-Registrar)",
+    "actorName": "K. R. Venkatraman",
+    "action": "ENCUMBRANCE_PRE_CHECK_CLEARED",
+    "ulpin": "IN-KA-BLR-2024-084912",
+    "ipAddress": "10.33.88.19",
+    "hash": "77bc901aef44091a998124018ba201",
+    "details": "Validated CERSAI mortgage lien against SBI consortium before deed indexing."
+  },
+  {
+    "id": "AUD-991202",
+    "timestamp": "2026-09-10 14:02:40",
+    "actorRole": "Citizen User",
+    "actorName": "Vikram Singh Rathore",
+    "action": "PROPERTY_TAX_ONLINE_QUERY",
+    "ulpin": "IN-RJ-JAI-2024-031204",
+    "ipAddress": "157.34.88.90",
+    "hash": "33bfa89012cd889021a88b14e99124",
+    "details": "Queried pending municipal tax dues for FY 2024-25."
+  },
+  {
+    "id": "AUD-991201",
+    "timestamp": "2026-09-10 11:45:19",
+    "actorRole": "Court Liaison Officer",
+    "actorName": "e-Courts Automated Gateway",
+    "action": "COURT_STAY_ALERT_LOCKED",
+    "ulpin": "IN-UP-VAR-2024-019482",
+    "ipAddress": "10.0.12.8",
+    "hash": "119284fae890bc4412984ea00918ef",
+    "details": "Automated freeze lock engaged following Civil Suit 441/2022 interim restraining order."
+  }
+]

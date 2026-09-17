@@ -1,0 +1,410 @@
+[
+  {
+    "id": "APP-2026-MUT-8454",
+    "applicationType": "Mutation / Khata Transfer",
+    "ulpin": "IN-MH-PUN-2024-009871",
+    "applicantName": "Rameshwar D. Patil",
+    "applicantPhone": "+91 98230 11000",
+    "applicantEmail": "patil@demo.gov.in",
+    "appliedDate": "2026-09-11",
+    "status": "In Progress: Revenue Inspector / Patwari Field Verification",
+    "currentStage": 2,
+    "buyerDetails": {
+      "buyerName": "Sanjay Mahadev Deshmukh",
+      "buyerAadhaar": "XXXXXXXX7812",
+      "buyerShare": 50
+    },
+    "stages": [
+      {
+        "title": "Application Submitted Online",
+        "description": "Citizen submitted mutation request with deed details",
+        "timestamp": "9/11/2026, 11:43:42 AM",
+        "status": "completed",
+        "officer": "Anand S. Kulkarni (Patwari Hinjawadi)"
+      },
+      {
+        "title": "Revenue Inspector / Patwari Field Verification",
+        "description": "Physical & Cadastral GIS stone verification & public notice",
+        "timestamp": "In Progress",
+        "status": "active",
+        "officer": "Patwari / Talathi"
+      },
+      {
+        "title": "Sub-Registrar Deed Verification",
+        "description": "Validation against SRO Deed Index-II registry",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "Sub-Registrar"
+      },
+      {
+        "title": "Tehsildar Digital Order & 7/12 RoR Update",
+        "description": "Final order generation and automated record mutation",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "Tehsildar"
+      }
+    ],
+    "documents": [
+      {
+        "name": "Registered Deed Copy",
+        "file": "Deed_Uploaded.pdf",
+        "verified": true
+      },
+      {
+        "name": "Buyer & Seller KYC Identity",
+        "file": "KYC_Aadhaar.pdf",
+        "verified": true
+      }
+    ],
+    "notes": "SIH Live Demo Mutation Verification"
+  },
+  {
+    "id": "APP-2026-MUT-2923",
+    "applicationType": "Mutation / Khata Transfer",
+    "ulpin": "IN-MH-PUN-2024-009871",
+    "applicantName": "Rameshwar D. Patil",
+    "applicantPhone": "+91 98230 11000",
+    "applicantEmail": "patil@demo.gov.in",
+    "appliedDate": "2026-09-11",
+    "status": "In Progress: Revenue Inspector / Patwari Field Verification",
+    "currentStage": 2,
+    "buyerDetails": {
+      "buyerName": "Sanjay Mahadev Deshmukh",
+      "buyerAadhaar": "XXXXXXXX7812",
+      "buyerShare": 50
+    },
+    "stages": [
+      {
+        "title": "Application Submitted Online",
+        "description": "Citizen submitted mutation request with deed details",
+        "timestamp": "9/11/2026, 11:39:16 AM",
+        "status": "completed",
+        "officer": "Anand S. Kulkarni (Patwari Hinjawadi)"
+      },
+      {
+        "title": "Revenue Inspector / Patwari Field Verification",
+        "description": "Physical & Cadastral GIS stone verification & public notice",
+        "timestamp": "In Progress",
+        "status": "active",
+        "officer": "Patwari / Talathi"
+      },
+      {
+        "title": "Sub-Registrar Deed Verification",
+        "description": "Validation against SRO Deed Index-II registry",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "Sub-Registrar"
+      },
+      {
+        "title": "Tehsildar Digital Order & 7/12 RoR Update",
+        "description": "Final order generation and automated record mutation",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "Tehsildar"
+      }
+    ],
+    "documents": [
+      {
+        "name": "Registered Deed Copy",
+        "file": "Deed_Uploaded.pdf",
+        "verified": true
+      },
+      {
+        "name": "Buyer & Seller KYC Identity",
+        "file": "KYC_Aadhaar.pdf",
+        "verified": true
+      }
+    ],
+    "notes": "SIH Live Demo Mutation Verification"
+  },
+  {
+    "id": "APP-2026-MUT-4914",
+    "applicationType": "Mutation / Khata Transfer",
+    "ulpin": "IN-TG-HYD-2024-041829",
+    "applicantName": "rahul",
+    "applicantPhone": "6952626662",
+    "applicantEmail": "applicant@example.com",
+    "appliedDate": "2026-09-10",
+    "status": "Pending Patwari Verification",
+    "currentStage": 1,
+    "buyerDetails": {
+      "buyerName": "sanjay",
+      "buyerAadhaar": "6666396",
+      "buyerShare": 100
+    },
+    "stages": [
+      {
+        "title": "Application Submitted Online",
+        "description": "Citizen submitted mutation request with deed details",
+        "timestamp": "9/10/2026, 11:14:47 PM",
+        "status": "completed",
+        "officer": "Citizen Self-Service"
+      },
+      {
+        "title": "Revenue Inspector / Patwari Field Verification",
+        "description": "Physical & Cadastral GIS stone verification & public notice",
+        "timestamp": "In Progress",
+        "status": "active",
+        "officer": "Patwari / Talathi"
+      },
+      {
+        "title": "Sub-Registrar Deed Verification",
+        "description": "Validation against SRO Deed Index-II registry",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "Sub-Registrar"
+      },
+      {
+        "title": "Tehsildar Digital Order & 7/12 RoR Update",
+        "description": "Final order generation and automated record mutation",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "Tehsildar"
+      }
+    ],
+    "documents": [
+      {
+        "name": "Registered Deed Copy",
+        "file": "Deed_Uploaded.pdf",
+        "verified": true
+      },
+      {
+        "name": "Buyer & Seller KYC Identity",
+        "file": "KYC_Aadhaar.pdf",
+        "verified": true
+      }
+    ],
+    "notes": "Online mutation application filed through LAND STACK DPI."
+  },
+  {
+    "id": "APP-2026-MUT-5013",
+    "applicationType": "Mutation / Khata Transfer",
+    "ulpin": "IN-TG-HYD-2024-041829",
+    "applicantName": "sujit",
+    "applicantPhone": "5555555555",
+    "applicantEmail": "applicant@example.com",
+    "appliedDate": "2026-09-10",
+    "status": "Pending Patwari Verification",
+    "currentStage": 1,
+    "buyerDetails": {
+      "buyerName": "sanjay",
+      "buyerAadhaar": "6565956565545",
+      "buyerShare": 100
+    },
+    "stages": [
+      {
+        "title": "Application Submitted Online",
+        "description": "Citizen submitted mutation request with deed details",
+        "timestamp": "9/10/2026, 11:11:06 PM",
+        "status": "completed",
+        "officer": "Citizen Self-Service"
+      },
+      {
+        "title": "Revenue Inspector / Patwari Field Verification",
+        "description": "Physical & Cadastral GIS stone verification & public notice",
+        "timestamp": "In Progress",
+        "status": "active",
+        "officer": "Patwari / Talathi"
+      },
+      {
+        "title": "Sub-Registrar Deed Verification",
+        "description": "Validation against SRO Deed Index-II registry",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "Sub-Registrar"
+      },
+      {
+        "title": "Tehsildar Digital Order & 7/12 RoR Update",
+        "description": "Final order generation and automated record mutation",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "Tehsildar"
+      }
+    ],
+    "documents": [
+      {
+        "name": "Registered Deed Copy",
+        "file": "Deed_Uploaded.pdf",
+        "verified": true
+      },
+      {
+        "name": "Buyer & Seller KYC Identity",
+        "file": "KYC_Aadhaar.pdf",
+        "verified": true
+      }
+    ],
+    "notes": "Online mutation application filed through LAND STACK DPI."
+  },
+  {
+    "id": "APP-2026-MUT-4415",
+    "applicationType": "Mutation / Khata Transfer",
+    "ulpin": "IN-MH-PUN-2024-009871",
+    "applicantName": "Rameshwar D. Patil",
+    "applicantPhone": "+91 98230 11000",
+    "applicantEmail": "patil@demo.gov.in",
+    "appliedDate": "2026-09-10",
+    "status": "In Progress: Revenue Inspector / Patwari Field Verification",
+    "currentStage": 2,
+    "buyerDetails": {
+      "buyerName": "Sanjay Mahadev Deshmukh",
+      "buyerAadhaar": "XXXXXXXX7812",
+      "buyerShare": 50
+    },
+    "stages": [
+      {
+        "title": "Application Submitted Online",
+        "description": "Citizen submitted mutation request with deed details",
+        "timestamp": "9/10/2026, 10:23:15 PM",
+        "status": "completed",
+        "officer": "Anand S. Kulkarni (Patwari Hinjawadi)"
+      },
+      {
+        "title": "Revenue Inspector / Patwari Field Verification",
+        "description": "Physical & Cadastral GIS stone verification & public notice",
+        "timestamp": "In Progress",
+        "status": "active",
+        "officer": "Patwari / Talathi"
+      },
+      {
+        "title": "Sub-Registrar Deed Verification",
+        "description": "Validation against SRO Deed Index-II registry",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "Sub-Registrar"
+      },
+      {
+        "title": "Tehsildar Digital Order & 7/12 RoR Update",
+        "description": "Final order generation and automated record mutation",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "Tehsildar"
+      }
+    ],
+    "documents": [
+      {
+        "name": "Registered Deed Copy",
+        "file": "Deed_Uploaded.pdf",
+        "verified": true
+      },
+      {
+        "name": "Buyer & Seller KYC Identity",
+        "file": "KYC_Aadhaar.pdf",
+        "verified": true
+      }
+    ],
+    "notes": "SIH Live Demo Mutation Verification"
+  },
+  {
+    "id": "APP-2024-MUT-8841",
+    "applicationType": "Mutation / Khata Transfer",
+    "ulpin": "IN-MH-PUN-2024-009871",
+    "applicantName": "Sunita Rameshwar Patil",
+    "applicantPhone": "+91 98230 91823",
+    "applicantEmail": "sunita.patil@example.com",
+    "appliedDate": "2026-09-02",
+    "status": "Pending Patwari Verification",
+    "currentStage": 2,
+    "stages": [
+      {
+        "title": "Application Submitted",
+        "description": "Online application received with uploaded deed & identity proof",
+        "timestamp": "2026-09-02 10:30 AM",
+        "status": "completed",
+        "officer": "Citizen Self-Service"
+      },
+      {
+        "title": "Field Survey & GIS Verification",
+        "description": "Revenue Inspector / Patwari boundary verification and notice issuance",
+        "timestamp": "In Progress",
+        "status": "active",
+        "officer": "Patwari (Hinjawadi Saja)"
+      },
+      {
+        "title": "Sub-Registrar Cross-Check",
+        "description": "Validation against SRO Deed Index-II and Encumbrance records",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "Sub-Registrar Mulshi-II"
+      },
+      {
+        "title": "Tehsildar Digital Order & RoR Update",
+        "description": "Final sanction with digital signature and update of 7/12 extract",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "Tahsildar Mulshi"
+      }
+    ],
+    "documents": [
+      {
+        "name": "Registered Sale Deed",
+        "file": "Deed_DOC_2018_9412.pdf",
+        "verified": true
+      },
+      {
+        "name": "Aadhaar Card",
+        "file": "Aadhaar_Sunita_Patil.pdf",
+        "verified": true
+      },
+      {
+        "name": "Latest 7/12 Extract",
+        "file": "7_12_Extract_489.pdf",
+        "verified": true
+      }
+    ],
+    "notes": "Application for consolidation of family share following family settlement."
+  },
+  {
+    "id": "APP-2024-NOC-1029",
+    "applicationType": "Building Permission NOC",
+    "ulpin": "IN-RJ-JAI-2024-031204",
+    "applicantName": "Vikram Singh Rathore",
+    "applicantPhone": "+91 94140 38291",
+    "applicantEmail": "vikram.rathore@example.com",
+    "appliedDate": "2026-09-05",
+    "status": "Under Municipal Scrutiny",
+    "currentStage": 2,
+    "stages": [
+      {
+        "title": "NOC Application Submitted",
+        "description": "Architectural drawings and structural drawings uploaded",
+        "timestamp": "2026-09-05 11:15 AM",
+        "status": "completed",
+        "officer": "Citizen Portal"
+      },
+      {
+        "title": "GIS Zoning & Setback Scrutiny",
+        "description": "Automated cross-check against Master Plan 2025 road widening & buffer lines",
+        "timestamp": "In Progress",
+        "status": "active",
+        "officer": "JDA Town Planning Wing"
+      },
+      {
+        "title": "Site Inspection by Junior Engineer",
+        "description": "Physical setback verification on ground",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "JE Zone-8 JDA"
+      },
+      {
+        "title": "Digital Sanction Letter Issued",
+        "description": "Building permit sanction QR code generated",
+        "timestamp": "Pending",
+        "status": "pending",
+        "officer": "Executive Engineer JDA"
+      }
+    ],
+    "documents": [
+      {
+        "name": "Sanctioned Site Plan",
+        "file": "Site_Plan_Plot72.pdf",
+        "verified": true
+      },
+      {
+        "name": "Structural Stability Certificate",
+        "file": "Structure_Cert.pdf",
+        "verified": true
+      }
+    ],
+    "notes": "Proposed Stilt+3 Residential House as per Master Plan R-1 norms."
+  }
+]
