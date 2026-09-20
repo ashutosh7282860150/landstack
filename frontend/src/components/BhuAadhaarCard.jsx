@@ -45,71 +45,72 @@ export const BhuAadhaarCard = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[2000] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-white text-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-[2000] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white text-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
         
         {/* Action Header (Not printed) */}
-        <div className="bg-slate-900 text-white px-6 py-3 flex items-center justify-between print:hidden">
+        <div className="bg-slate-900 text-white px-4 sm:px-6 py-3 flex items-center justify-between print:hidden shrink-0">
           <div className="flex items-center space-x-2">
-            <QrCode className="w-5 h-5 text-emerald-400" />
-            <span className="font-bold text-sm">Bhu-Aadhaar Digital Land Passbook (Certificate)</span>
+            <QrCode className="w-5 h-5 text-emerald-400 shrink-0" />
+            <span className="font-bold text-xs sm:text-sm truncate max-w-[200px] sm:max-w-none">Bhu-Aadhaar Digital Land Passbook</span>
           </div>
 
           <div className="flex items-center space-x-2">
             <button
               onClick={handlePrint}
-              className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 transition-colors cursor-pointer"
+              className="px-2.5 sm:px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 transition-colors cursor-pointer shrink-0"
             >
-              <Printer className="w-4 h-4" />
-              <span>Print / Save PDF</span>
+              <Printer className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Print / Save PDF</span>
+              <span className="sm:hidden">Print</span>
             </button>
             <button
               onClick={() => setIsBhuAadhaarModalOpen(false)}
-              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
+              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white shrink-0"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         </div>
 
         {/* Printable Official Certificate Body */}
-        <div id="printable-bhu-aadhaar" className="p-8 space-y-6 relative bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
+        <div id="printable-bhu-aadhaar" className="p-4 sm:p-8 space-y-4 sm:space-y-6 relative bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] overflow-y-auto flex-1">
           
           {/* Official Emblem & Header */}
-          <div className="text-center border-b-2 border-emerald-800/60 pb-4">
+          <div className="text-center border-b-2 border-emerald-800/60 pb-3 sm:pb-4">
             <div className="flex justify-center mb-1">
-              <div className="w-12 h-12 rounded-full bg-emerald-700 text-white flex items-center justify-center font-serif text-xl font-bold shadow-md">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-700 text-white flex items-center justify-center font-serif text-lg sm:text-xl font-bold shadow-md">
                 🏛️
               </div>
             </div>
-            <h2 className="text-xs uppercase font-extrabold tracking-widest text-emerald-900">
+            <h2 className="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-emerald-900">
               Government Digital Public Infrastructure for Land
             </h2>
-            <h1 className="text-xl font-black text-slate-900 uppercase tracking-tight mt-0.5">
+            <h1 className="text-base sm:text-xl font-black text-slate-900 uppercase tracking-tight mt-0.5">
               BHU-AADHAAR • DIGITAL LAND PARCEL CERTIFICATE
             </h1>
-            <p className="text-[11px] text-slate-600 font-medium">
+            <p className="text-[10px] sm:text-[11px] text-slate-600 font-medium">
               Issued under the National Land Governance DPI Framework (Demo Standard)
             </p>
           </div>
 
           {/* Top Identifier Bar */}
-          <div className="grid grid-cols-2 gap-4 bg-emerald-50/80 border border-emerald-200 rounded-xl p-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 bg-emerald-50/80 border border-emerald-200 rounded-xl p-3">
             <div>
               <span className="text-[10px] text-emerald-800 font-bold uppercase block">14-Digit ULPIN</span>
-              <span className="text-base font-black font-mono text-emerald-950">{parcel.ulpin}</span>
+              <span className="text-sm sm:text-base font-black font-mono text-emerald-950 break-all">{parcel.ulpin}</span>
             </div>
-            <div className="text-right">
+            <div className="sm:text-right">
               <span className="text-[10px] text-emerald-800 font-bold uppercase block">Bhu-Aadhaar Number</span>
-              <span className="text-base font-black font-mono text-emerald-950">{parcel.bhuAadhaar}</span>
+              <span className="text-sm sm:text-base font-black font-mono text-emerald-950 break-all">{parcel.bhuAadhaar}</span>
             </div>
           </div>
 
           {/* Main Grid: Details + QR Code */}
-          <div className="grid grid-cols-3 gap-6 items-start">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 items-start">
             
             {/* Left 2 Cols: Cadastral & Ownership Info */}
-            <div className="col-span-2 space-y-4 text-xs">
+            <div className="col-span-1 sm:col-span-2 space-y-3 sm:space-y-4 text-xs">
               
               {/* Spatial Cadastre */}
               <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1">

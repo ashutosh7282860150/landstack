@@ -13,19 +13,21 @@ import { AdminAnalytics } from './components/AdminAnalytics';
 import { BhuAadhaarCard } from './components/BhuAadhaarCard';
 import { QRVerifyModal } from './components/QRVerifyModal';
 import { CompareParcelsModal } from './components/CompareParcelsModal';
+import { SettingsModal } from './components/SettingsModal';
 import { AuthModal } from './components/AuthModal';
+import { AiChatbot } from './components/AiChatbot';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 export function App() {
   const { activeTab, toast } = useLandStack();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
       {/* Top Fixed Navbar */}
       <Navbar />
 
       {/* Main Dynamic View Content */}
-      <main className="flex-1">
+      <main className="flex-1 w-full max-w-full overflow-x-hidden">
         {activeTab === 'home' && (
           <div>
             <HeroSection />
@@ -44,15 +46,17 @@ export function App() {
       {/* Footer */}
       {activeTab !== 'map' && <Footer />}
 
-      {/* Global Interactive Modals */}
+      {/* Global Interactive Modals & Floating AI Chatbot */}
       <AuthModal />
       <BhuAadhaarCard />
       <QRVerifyModal />
       <CompareParcelsModal />
+      <SettingsModal />
+      <AiChatbot />
 
       {/* Toast Notification Container */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-[3000] animate-in fade-in slide-in-from-bottom-5 duration-300">
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 max-w-[calc(100vw-2rem)] z-[3000] animate-in fade-in slide-in-from-bottom-5 duration-300">
           <div className={`px-4 py-3 rounded-2xl shadow-2xl border flex items-center space-x-3 text-xs font-semibold backdrop-blur-md ${
             toast.type === 'error'
               ? 'bg-red-950/90 border-red-500/50 text-red-200'

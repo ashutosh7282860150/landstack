@@ -3,16 +3,21 @@
 @tailwind utilities;
 
 @layer base {
-  body {
+  html, body {
     @apply bg-slate-950 text-slate-100 font-sans antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
-/* Custom Scrollbars */
+/* Touch friendly custom scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: #090d16;
@@ -23,6 +28,103 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #334155;
+}
+
+/* =========================================================
+   DYNAMIC THEME OVERRIDES (Light Mode, Dark Mode, Night View)
+   ========================================================= */
+
+/* --- 1. LIGHT MODE THEME --- */
+html.theme-light,
+html.theme-light body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html.theme-light .bg-slate-950,
+html.theme-light .bg-slate-900 {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+html.theme-light .bg-slate-950\/90,
+html.theme-light .bg-slate-950\/95,
+html.theme-light .bg-slate-950\/80,
+html.theme-light .bg-slate-900\/90,
+html.theme-light .bg-slate-900\/95,
+html.theme-light .bg-slate-900\/80 {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  color: #0f172a !important;
+}
+
+html.theme-light .bg-slate-800,
+html.theme-light .bg-slate-800\/90,
+html.theme-light .bg-slate-800\/80,
+html.theme-light .bg-slate-800\/40,
+html.theme-light .bg-slate-850 {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+}
+
+html.theme-light .bg-slate-750,
+html.theme-light .bg-slate-700 {
+  background-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+html.theme-light .text-white,
+html.theme-light .text-slate-100,
+html.theme-light .text-slate-200,
+html.theme-light .text-slate-300 {
+  color: #0f172a !important;
+}
+
+html.theme-light .text-slate-400,
+html.theme-light .text-slate-500 {
+  color: #475569 !important;
+}
+
+html.theme-light .border-slate-800,
+html.theme-light .border-slate-750,
+html.theme-light .border-slate-700,
+html.theme-light .border-slate-600 {
+  border-color: #cbd5e1 !important;
+}
+
+html.theme-light input,
+html.theme-light select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* --- 2. NIGHT VIEW (MIDNIGHT OLED) THEME --- */
+html.theme-night,
+html.theme-night body {
+  background-color: #000000 !important;
+  color: #f8fafc !important;
+}
+
+html.theme-night .bg-slate-950 {
+  background-color: #000000 !important;
+}
+
+html.theme-night .bg-slate-900 {
+  background-color: #050914 !important;
+}
+
+html.theme-night .bg-slate-800,
+html.theme-night .bg-slate-850 {
+  background-color: #0c1322 !important;
+}
+
+html.theme-night .border-slate-800,
+html.theme-night .border-slate-700 {
+  border-color: #1e293b !important;
+}
+
+html.theme-night .text-emerald-400 {
+  color: #22d3ee !important;
 }
 
 /* Leaflet Overrides for GovTech Dark Theme */

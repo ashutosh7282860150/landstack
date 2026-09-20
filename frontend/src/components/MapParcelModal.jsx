@@ -45,7 +45,7 @@ export const MapParcelModal = ({ parcel, onClose }) => {
   };
 
   return (
-    <div className="absolute bottom-4 left-4 right-4 md:right-auto md:w-96 bg-slate-900/95 backdrop-blur-md border border-slate-700/90 rounded-2xl shadow-2xl z-[1000] p-4 text-xs text-slate-200 animate-in fade-in slide-in-from-bottom duration-300">
+    <div className="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-auto sm:w-96 max-h-[75vh] overflow-y-auto bg-slate-900/95 backdrop-blur-md border border-slate-700/90 rounded-2xl shadow-2xl z-[1000] p-3 sm:p-4 text-xs text-slate-200 animate-in fade-in slide-in-from-bottom duration-300">
       
       {/* Header */}
       <div className="flex items-start justify-between border-b border-slate-800 pb-3 mb-3">

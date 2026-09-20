@@ -32,7 +32,8 @@ export const HeroSection = () => {
     setIsAuthModalOpen,
     setAuthModalMode,
     logoutUser,
-    showToast
+    showToast,
+    t
   } = useLandStack();
 
   const [searchInput, setSearchInput] = useState('');
@@ -67,7 +68,7 @@ export const HeroSection = () => {
         <div className="flex justify-center mb-6">
           <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold shadow-inner">
             <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-            <span>Integrated GIS-based Digital Public Infrastructure (DPI)</span>
+            <span>{t('hero.tag')}</span>
             <span className="bg-emerald-500/20 px-1.5 py-0.5 rounded text-[10px] text-emerald-300 font-mono">
               GovTech Prototype
             </span>
@@ -75,26 +76,26 @@ export const HeroSection = () => {
         </div>
 
         {/* Hero Headline */}
-        <div className="text-center max-w-4xl mx-auto mb-10">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
-            One Parcel. One Digital Identity. <br className="hidden sm:inline" />
+        <div className="text-center max-w-4xl mx-auto mb-8 sm:mb-10">
+          <h1 className="text-2xl sm:text-4xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
+            {t('hero.headline1')} <br className="hidden sm:inline" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-blue-400">
-              One Unified Land Platform.
+              {t('hero.headline2')}
             </span>
           </h1>
 
-          <p className="mt-4 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
-            An Integrated GIS-based Digital Public Infrastructure for Land Governance connecting Revenue Records, Deed Registration, Town Planning Zoning, Municipal NOCs, and Banking Liens.
+          <p className="mt-3 text-sm sm:text-base lg:text-lg text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
+            {t('hero.subhead')}
           </p>
         </div>
 
         {/* User Authentication & Quick Sign-In Gateway Card on Home Page */}
-        <div className="max-w-3xl mx-auto bg-slate-900/90 backdrop-blur-md p-5 rounded-2xl border border-slate-750 shadow-2xl mb-8">
+        <div className="max-w-3xl mx-auto bg-slate-900/90 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-slate-750 shadow-2xl mb-8">
           {currentUser ? (
             /* Logged in Citizen / Admin Banner */
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-xs">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+                <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm shrink-0">
                   {currentUser.name.charAt(0)}
                 </div>
                 <div>
@@ -113,14 +114,14 @@ export const HeroSection = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => selectParcelByUlpin('IN-MH-PUN-2024-009871')}
-                  className="px-3 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl flex items-center space-x-1 transition-all"
+                  className="px-3 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl flex items-center space-x-1 transition-all text-xs"
                 >
                   <MapPin className="w-3.5 h-3.5" />
                   <span>My Land Parcel</span>
                 </button>
                 <button
                   onClick={logoutUser}
-                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 font-medium transition-all"
+                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 font-medium transition-all text-xs"
                 >
                   Logout
                 </button>
@@ -132,7 +133,7 @@ export const HeroSection = () => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
                 <div>
                   <h3 className="font-extrabold text-white text-sm flex items-center gap-2">
-                    <Smartphone className="w-4 h-4 text-emerald-400" />
+                    <Smartphone className="w-4 h-4 text-emerald-400 shrink-0" />
                     Citizen & Official Login / Registration Gateway
                   </h3>
                   <p className="text-slate-400 text-[11px]">
@@ -145,7 +146,7 @@ export const HeroSection = () => {
                     setAuthModalMode('register');
                     setIsAuthModalOpen(true);
                   }}
-                  className="px-3 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/40 text-[11px] font-semibold transition-all self-start sm:self-auto"
+                  className="px-3 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/40 text-[11px] font-semibold transition-all self-start sm:self-auto shrink-0"
                 >
                   + New Citizen Registration
                 </button>
@@ -165,7 +166,7 @@ export const HeroSection = () => {
                     </span>
                     <span className="text-slate-500 text-[10px]">10-Digit Mobile + OTP</span>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 transition-colors" />
+                  <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 transition-colors shrink-0 ml-1" />
                 </button>
 
                 <button
@@ -181,7 +182,7 @@ export const HeroSection = () => {
                     </span>
                     <span className="text-slate-500 text-[10px]">12-Digit UIDAI + OTP</span>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-blue-400 transition-colors" />
+                  <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-blue-400 transition-colors shrink-0 ml-1" />
                 </button>
 
                 <button
@@ -197,7 +198,7 @@ export const HeroSection = () => {
                     </span>
                     <span className="text-slate-500 text-[10px]">Parichay / Employee SSO</span>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-amber-400 transition-colors" />
+                  <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-amber-400 transition-colors shrink-0 ml-1" />
                 </button>
               </div>
             </div>
@@ -208,30 +209,30 @@ export const HeroSection = () => {
         <div className="max-w-3xl mx-auto bg-slate-800/80 backdrop-blur-md p-3 sm:p-4 rounded-2xl border border-slate-700 shadow-2xl mb-8">
           <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Enter 14-digit ULPIN, Survey No, Khasra, Owner Name, or Village..."
-                className="w-full pl-11 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                placeholder={t('hero.searchPlaceholder')}
+                className="w-full pl-10 pr-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
               />
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto">
               <button
                 type="submit"
-                className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2 transition-all cursor-pointer"
+                className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-xs sm:text-sm rounded-xl shadow-lg flex items-center justify-center space-x-1.5 transition-all cursor-pointer"
               >
-                <span>Search Parcel</span>
+                <span>{t('hero.searchBtn')}</span>
                 <ArrowRight className="w-4 h-4 text-slate-950" />
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab('map')}
-                className="px-4 py-3 bg-slate-700/70 hover:bg-slate-700 text-white font-semibold text-sm rounded-xl border border-slate-600 flex items-center space-x-2 transition-all"
+                className="px-4 py-2.5 bg-slate-700/70 hover:bg-slate-700 text-white font-semibold text-xs sm:text-sm rounded-xl border border-slate-600 flex items-center justify-center space-x-1.5 transition-all shrink-0"
               >
                 <MapPin className="w-4 h-4 text-emerald-400" />
-                <span className="hidden sm:inline">GIS Map</span>
+                <span>{t('hero.gisMapBtn')}</span>
               </button>
             </div>
           </form>
@@ -239,7 +240,7 @@ export const HeroSection = () => {
           {/* Quick Demo Parcel Links */}
           <div className="mt-3 pt-3 border-t border-slate-700/60 flex flex-wrap items-center gap-1.5 text-xs">
             <span className="text-slate-400 font-medium flex items-center gap-1 mr-1">
-              <Fingerprint className="w-3.5 h-3.5 text-emerald-400" /> Quick Samples:
+              <Fingerprint className="w-3.5 h-3.5 text-emerald-400" /> {t('hero.quickSamples')}
             </span>
             {sampleUlpinPills.map((pill) => (
               <button
@@ -259,35 +260,35 @@ export const HeroSection = () => {
         {/* Live Metrics Counter Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto">
           <div className="bg-slate-800/40 backdrop-blur border border-slate-700/60 rounded-xl p-3 text-center">
-            <div className="text-slate-400 text-xs font-medium mb-1">Digitized Cadastre</div>
+            <div className="text-slate-400 text-xs font-medium mb-1">{t('hero.digitizedCadastre')}</div>
             <div className="text-xl sm:text-2xl font-extrabold text-white font-mono">
-              {stats?.totalParcels || 8} <span className="text-xs font-normal text-emerald-400">Parcels</span>
+              {stats?.totalParcels || 8} <span className="text-xs font-normal text-emerald-400">{t('hero.parcels')}</span>
             </div>
-            <div className="text-[10px] text-slate-500 mt-0.5">Across 6 States</div>
+            <div className="text-[10px] text-slate-500 mt-0.5">{t('hero.acrossStates')}</div>
           </div>
 
           <div className="bg-slate-800/40 backdrop-blur border border-slate-700/60 rounded-xl p-3 text-center">
-            <div className="text-slate-400 text-xs font-medium mb-1">Total Geo-Area</div>
+            <div className="text-slate-400 text-xs font-medium mb-1">{t('hero.totalArea')}</div>
             <div className="text-xl sm:text-2xl font-extrabold text-white font-mono">
               {stats?.totalAreaHectares || '20.33'} <span className="text-xs font-normal text-teal-400">Ha</span>
             </div>
-            <div className="text-[10px] text-slate-500 mt-0.5">DGPS High Precision</div>
+            <div className="text-[10px] text-slate-500 mt-0.5">{t('hero.precisionDgps')}</div>
           </div>
 
           <div className="bg-slate-800/40 backdrop-blur border border-slate-700/60 rounded-xl p-3 text-center">
-            <div className="text-slate-400 text-xs font-medium mb-1">Integrated Registries</div>
+            <div className="text-slate-400 text-xs font-medium mb-1">{t('hero.integratedRegistries')}</div>
             <div className="text-xl sm:text-2xl font-extrabold text-white font-mono text-emerald-400">
               8-in-1 <span className="text-xs font-normal text-slate-400">Stack</span>
             </div>
-            <div className="text-[10px] text-slate-500 mt-0.5">Revenue to e-Courts</div>
+            <div className="text-[10px] text-slate-500 mt-0.5">{t('hero.revenueToCourts')}</div>
           </div>
 
           <div className="bg-slate-800/40 backdrop-blur border border-slate-700/60 rounded-xl p-3 text-center">
-            <div className="text-slate-400 text-xs font-medium mb-1">Title Health Index</div>
+            <div className="text-slate-400 text-xs font-medium mb-1">{t('hero.titleHealth')}</div>
             <div className="text-xl sm:text-2xl font-extrabold text-white font-mono text-blue-400">
-              {stats?.clearTitlePercentage || 88}% <span className="text-xs font-normal text-slate-400">Clear</span>
+              {stats?.clearTitlePercentage || 88}% <span className="text-xs font-normal text-slate-400">{t('hero.clearTitle')}</span>
             </div>
-            <div className="text-[10px] text-slate-500 mt-0.5">Automated Risk Engine</div>
+            <div className="text-[10px] text-slate-500 mt-0.5">{t('hero.riskEngine')}</div>
           </div>
         </div>
 
@@ -301,10 +302,10 @@ export const HeroSection = () => {
               <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
                 <MapPin className="w-4 h-4 group-hover:scale-110 transition-transform" />
               </div>
-              <h3 className="font-semibold text-white text-sm">Interactive GIS Cadastre</h3>
+              <h3 className="font-semibold text-white text-sm">{t('hero.card1Title')}</h3>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Explore real-time GeoJSON cadastral boundaries, land-use zoning layers, and spatial measurements across urban and rural zones.
+              {t('hero.card1Desc')}
             </p>
           </div>
 
@@ -316,10 +317,10 @@ export const HeroSection = () => {
               <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
                 <Layers className="w-4 h-4 group-hover:scale-110 transition-transform" />
               </div>
-              <h3 className="font-semibold text-white text-sm">8-in-1 Unified Dossier</h3>
+              <h3 className="font-semibold text-white text-sm">{t('hero.card2Title')}</h3>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              View synchronized 7/12 RoR, registered sale deeds, Master Plan FAR, municipal NOCs, property taxes, and active court disputes.
+              {t('hero.card2Desc')}
             </p>
           </div>
 
@@ -331,10 +332,10 @@ export const HeroSection = () => {
               <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
                 <ShieldCheck className="w-4 h-4 group-hover:scale-110 transition-transform" />
               </div>
-              <h3 className="font-semibold text-white text-sm">Citizen & Officer Workflows</h3>
+              <h3 className="font-semibold text-white text-sm">{t('hero.card3Title')}</h3>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Apply for online mutation, generate official Bhu-Aadhaar passbooks with QR verification, and review officer approvals.
+              {t('hero.card3Desc')}
             </p>
           </div>
         </div>

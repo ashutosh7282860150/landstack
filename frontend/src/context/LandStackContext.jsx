@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { TRANSLATIONS } from '../utils/translations';
 
 const LandStackContext = createContext(null);
 
@@ -16,6 +17,51 @@ export const LandStackProvider = ({ children }) => {
   const [activeTab, setActiveTab] = useState('home'); // 'home' | 'map' | 'dossier' | 'services' | 'tracker' | 'officer_workflow' | 'admin' | 'compare'
   const [dossierSubTab, setDossierSubTab] = useState('overview');
   
+  // Theme & Language State
+  const [theme, setTheme] = useState(() => localStorage.getItem('landstack_theme') || 'dark'); // 'dark' | 'light' | 'night'
+  const [language, setLanguage] = useState(() => localStorage.getItem('landstack_lang') || 'en'); // 'en' | 'hi' | 'mr' | 'gu' | 'ta'
+
+  // Apply theme to HTML root element
+  useEffect(() => {
+    localStorage.setItem('landstack_theme', theme);
+    document.documentElement.classList.remove('theme-dark', 'theme-light', 'theme-night');
+    document.documentElement.classList.add(`theme-${theme}`);
+    if (theme === 'light') {
+      document.body.style.backgroundColor = '#f8fafc';
+      document.body.style.color = '#0f172a';
+    } else if (theme === 'night') {
+      document.body.style.backgroundColor = '#030712';
+      document.body.style.color = '#f9fafb';
+    } else {
+      document.body.style.backgroundColor = '#020617';
+      document.body.style.color = '#f8fafc';
+    }
+  }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem('landstack_lang', language);
+  }, [language]);
+
+  // Translation Helper
+  const t = (pathStr) => {
+    const keys = pathStr.split('.');
+    let res = TRANSLATIONS[language] || TRANSLATIONS['en'];
+    for (const k of keys) {
+      if (res && res[k]) {
+        res = res[k];
+      } else {
+        // Fallback to English
+        let fallback = TRANSLATIONS['en'];
+        for (const fk of keys) {
+          if (fallback && fallback[fk]) fallback = fallback[fk];
+          else return pathStr;
+        }
+        return typeof fallback === 'string' ? fallback : pathStr;
+      }
+    }
+    return typeof res === 'string' ? res : pathStr;
+  };
+
   const [parcels, setParcels] = useState([]);
   const [selectedParcel, setSelectedParcel] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -45,11 +91,13 @@ export const LandStackProvider = ({ children }) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('login'); // 'login' | 'register'
 
-  // Modals
+  // Modals & Chatbot State
   const [isBhuAadhaarModalOpen, setIsBhuAadhaarModalOpen] = useState(false);
   const [isQRVerifyModalOpen, setIsQRVerifyModalOpen] = useState(false);
   const [isMutationModalOpen, setIsMutationModalOpen] = useState(false);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
   // Toast
   const [toast, setToast] = useState(null);
@@ -220,6 +268,15 @@ export const LandStackProvider = ({ children }) => {
       setIsMutationModalOpen,
       isCompareModalOpen,
       setIsCompareModalOpen,
+      isSettingsModalOpen,
+      setIsSettingsModalOpen,
+      isChatbotOpen,
+      setIsChatbotOpen,
+      theme,
+      setTheme,
+      language,
+      setLanguage,
+      t,
       currentUser,
       setCurrentUser,
       isAuthModalOpen,

@@ -48,14 +48,14 @@ export const QRVerifyModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[2000] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto text-xs text-slate-200">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-[2000] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto text-xs text-slate-200">
+      <div className="relative w-full max-w-lg max-h-[90vh] flex flex-col bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
         
         {/* Header */}
-        <div className="bg-slate-950 px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div className="bg-slate-950 px-4 sm:px-6 py-3.5 border-b border-slate-800 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-2">
-            <QrCode className="w-5 h-5 text-emerald-400" />
-            <h2 className="font-bold text-white text-sm">ULPIN QR Code Authenticator</h2>
+            <QrCode className="w-5 h-5 text-emerald-400 shrink-0" />
+            <h2 className="font-bold text-white text-xs sm:text-sm">ULPIN QR Code Authenticator</h2>
           </div>
           <button
             onClick={() => {
@@ -63,13 +63,13 @@ export const QRVerifyModal = () => {
               setVerifiedParcel(null);
               setErrorMsg('');
             }}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
+            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1">
           <p className="text-slate-400 text-xs">
             Verify the authenticity of any printed Bhu-Aadhaar Passbook or ULPIN QR barcode against the DPI root ledger.
           </p>

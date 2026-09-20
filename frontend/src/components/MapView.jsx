@@ -70,7 +70,8 @@ export const MapView = () => {
     setSelectedParcel, 
     selectParcel,
     filters,
-    setFilters
+    setFilters,
+    t
   } = useLandStack();
 
   const [activeParcel, setActiveParcel] = useState(selectedParcel || null);
@@ -218,26 +219,34 @@ export const MapView = () => {
   };
 
   return (
-    <div className="relative w-full h-[calc(100vh-4rem)] flex flex-col bg-slate-950 overflow-hidden">
+    <div className="relative w-full h-[calc(100vh-7.5rem)] lg:h-[calc(100vh-4rem)] min-h-[500px] flex flex-col bg-slate-950 overflow-hidden">
       
       {/* Top Filter & GIS Navigation Bar */}
-      <div className="bg-slate-900 border-b border-slate-800 p-3 z-20 shadow-lg">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="bg-slate-900 border-b border-slate-800 p-2 sm:p-3 z-20 shadow-lg shrink-0">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 text-xs">
           
-          {/* Search Box */}
-          <div className="relative flex-1 min-w-[240px] max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search ULPIN, Survey No, Owner, Village..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
+          <div className="flex items-center gap-2 flex-1">
+            {/* Search Box */}
+            <div className="relative flex-1 min-w-[180px] max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder={t('map.searchPlaceholder')}
+                className="w-full pl-8 pr-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
+            {/* Quick Stats Pill */}
+            <div className="flex items-center space-x-1.5 bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-800 text-[11px] font-mono shrink-0">
+              <span className="text-slate-400 hidden sm:inline">{t('map.visibleCadastre')}</span>
+              <span className="text-emerald-400 font-bold">{filteredParcels.length} <span className="hidden sm:inline">Parcels</span></span>
+            </div>
           </div>
 
           {/* Cascading Location Selectors */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none shrink-0">
             {/* State */}
             <select
               value={selectedState}
@@ -250,9 +259,9 @@ export const MapView = () => {
                   setMapZoom(12);
                 }
               }}
-              className="px-2.5 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="px-2 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 shrink-0"
             >
-              <option value="">All States ({states.length})</option>
+              <option value="">{t('map.allStates')} ({states.length})</option>
               {states.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
 
@@ -267,9 +276,9 @@ export const MapView = () => {
                   setMapZoom(14);
                 }
               }}
-              className="px-2.5 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="px-2 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 shrink-0"
             >
-              <option value="">All Districts ({districts.length})</option>
+              <option value="">{t('map.allDistricts')} ({districts.length})</option>
               {districts.map(d => <option key={d} value={d}>{d}</option>)}
             </select>
 
@@ -277,9 +286,9 @@ export const MapView = () => {
             <select
               value={selectedLandUse}
               onChange={(e) => setSelectedLandUse(e.target.value)}
-              className="px-2.5 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="px-2 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 shrink-0"
             >
-              <option value="All">All Land Uses</option>
+              <option value="All">{t('map.allLandUses')}</option>
               <option value="Agricultural">Agricultural</option>
               <option value="Commercial">Commercial</option>
               <option value="Residential">Residential</option>
@@ -292,18 +301,12 @@ export const MapView = () => {
             <select
               value={selectedRiskFilter}
               onChange={(e) => setSelectedRiskFilter(e.target.value)}
-              className="px-2.5 py-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="px-2 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 shrink-0"
             >
-              <option value="All">All Title Statuses</option>
-              <option value="Clear">Clear Title Only</option>
-              <option value="Stayed">Court Stay / Flagged</option>
+              <option value="All">{t('map.allTitleStatuses')}</option>
+              <option value="Clear">{t('map.clearOnly')}</option>
+              <option value="Stayed">{t('map.stayedOnly')}</option>
             </select>
-          </div>
-
-          {/* Quick Stats Pill */}
-          <div className="flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 text-[11px] font-mono">
-            <span className="text-slate-400">Visible Cadastre:</span>
-            <span className="text-emerald-400 font-bold">{filteredParcels.length} Parcels</span>
           </div>
 
         </div>

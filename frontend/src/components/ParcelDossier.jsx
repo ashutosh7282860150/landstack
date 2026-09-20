@@ -154,7 +154,7 @@ export const ParcelDossier = () => {
       </div>
 
       {/* 8-in-1 Navigation Tabs */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-1.5 flex items-center gap-1 overflow-x-auto shadow-inner">
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-1.5 flex items-center gap-1 overflow-x-auto shadow-inner max-w-full no-scrollbar">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = dossierSubTab === tab.id;
@@ -162,7 +162,7 @@ export const ParcelDossier = () => {
             <button
               key={tab.id}
               onClick={() => setDossierSubTab(tab.id)}
-              className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap shrink-0 transition-all ${
                 isActive 
                   ? 'bg-emerald-500 text-slate-950 font-bold shadow-md' 
                   : 'text-slate-300 hover:text-white hover:bg-slate-800'
@@ -185,30 +185,30 @@ export const ParcelDossier = () => {
       </div>
 
       {/* Tab Content Panels */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-xs text-slate-200">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-2xl text-xs text-slate-200 max-w-full">
         
         {/* ========================================================
             TAB 1: OVERVIEW & SPATIAL CADASTRE
         ======================================================== */}
         {dossierSubTab === 'overview' && (
           <div className="space-y-6">
-            <div className="border-b border-slate-800 pb-3 flex items-center justify-between">
+            <div className="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <h2 className="text-base font-bold text-white flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-emerald-400" />
+                <h2 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
                   Cadastral Boundary & Spatial GIS Profile
                 </h2>
                 <p className="text-slate-400 text-[11px]">
                   Survey of India SVAMITVA / DGPS precision geospatial coordinates
                 </p>
               </div>
-              <span className="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] font-mono font-semibold">
+              <span className="self-start sm:self-auto px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] font-mono font-semibold shrink-0">
                 Accuracy: {parcel.spatialAttributes?.accuracyLevel}
               </span>
             </div>
 
             {/* Spatial Metrics Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
                 <span className="text-slate-400 block text-[10px]">Cadastral Area</span>
                 <span className="text-base font-extrabold text-emerald-400 font-mono block mt-0.5">

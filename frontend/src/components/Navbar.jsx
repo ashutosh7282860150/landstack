@@ -15,7 +15,10 @@ import {
   Sparkles,
   ExternalLink,
   Activity,
-  Award
+  Award,
+  Settings,
+  Globe,
+  Palette
 } from 'lucide-react';
 import { useLandStack, ROLES } from '../context/LandStackContext';
 
@@ -27,24 +30,28 @@ export const Navbar = () => {
     setActiveTab, 
     setIsQRVerifyModalOpen,
     setIsCompareModalOpen,
+    setIsSettingsModalOpen,
     compareList,
     currentUser,
     setIsAuthModalOpen,
     setAuthModalMode,
     logoutUser,
-    showToast
+    showToast,
+    language,
+    theme,
+    t
   } = useLandStack();
 
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
 
   const navItems = [
-    { id: 'home', label: 'Home', icon: Sparkles },
-    { id: 'map', label: 'GIS Land Map', icon: MapPin },
-    { id: 'dossier', label: '8-in-1 Dossier', icon: Layers },
-    { id: 'services', label: 'Citizen Services', icon: FileText },
-    { id: 'tracker', label: 'Track Application', icon: Activity },
-    { id: 'officer_workflow', label: 'Officer Portal', icon: ShieldCheck, highlight: true },
-    { id: 'admin', label: 'Admin & Audit', icon: Shield }
+    { id: 'home', label: t('nav.home'), icon: Sparkles },
+    { id: 'map', label: t('nav.map'), icon: MapPin },
+    { id: 'dossier', label: t('nav.dossier'), icon: Layers },
+    { id: 'services', label: t('nav.services'), icon: FileText },
+    { id: 'tracker', label: t('nav.tracker'), icon: Activity },
+    { id: 'officer_workflow', label: t('nav.officer'), icon: ShieldCheck, highlight: true },
+    { id: 'admin', label: t('nav.admin'), icon: Shield }
   ];
 
   return (
@@ -61,10 +68,15 @@ export const Navbar = () => {
         </div>
 
         <div className="flex items-center space-x-3">
-          {/* Demo Data Tag */}
-          <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-amber-500/10 text-amber-300 border border-amber-500/30">
-            Demo Data Only (Prototype)
-          </span>
+          {/* Settings Quick Trigger (Top Right Corner) */}
+          <button
+            onClick={() => setIsSettingsModalOpen(true)}
+            className="flex items-center space-x-1 text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/30 transition-all font-semibold"
+            title="Theme & Language Settings"
+          >
+            <Settings className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="font-mono text-[11px] uppercase">{language.toUpperCase()} • {theme.toUpperCase()}</span>
+          </button>
 
           {/* Quick Tools */}
           <button 
@@ -145,8 +157,17 @@ export const Navbar = () => {
             })}
           </nav>
 
-          {/* Right Action Controls: Login & Role Switcher */}
+          {/* Right Action Controls: Login, Settings & Role Switcher */}
           <div className="flex items-center space-x-2">
+            
+            {/* Top Right Settings Gear Button */}
+            <button
+              onClick={() => setIsSettingsModalOpen(true)}
+              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-750 border border-slate-700 text-slate-300 hover:text-emerald-400 transition-all cursor-pointer shadow-md"
+              title="Portal Settings (Theme & Language)"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
             
             {/* Citizen Auth Button / Profile Pill */}
             {currentUser ? (
@@ -197,7 +218,7 @@ export const Navbar = () => {
 
             {/* Dropdown Menu */}
             {roleDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-72 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-50 p-2 text-xs">
+              <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-1.5rem)] rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-50 p-2 text-xs">
                 <div className="px-2 py-1.5 border-b border-slate-800 mb-1">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                     Switch Stakeholder Persona (Live Demo)
@@ -245,7 +266,7 @@ export const Navbar = () => {
     </div>
 
       {/* Mobile Nav Bar */}
-      <div className="lg:hidden border-t border-slate-800/80 bg-slate-950/80 px-2 py-1.5 flex items-center justify-around overflow-x-auto text-[11px]">
+      <div className="lg:hidden border-t border-slate-800/80 bg-slate-950/95 px-2 py-1.5 flex items-center justify-start sm:justify-around overflow-x-auto text-[11px] gap-1 sm:gap-2">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -253,8 +274,8 @@ export const Navbar = () => {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center py-1 px-2 rounded font-medium whitespace-nowrap ${
-                isActive ? 'text-emerald-400' : 'text-slate-400 hover:text-slate-200'
+              className={`flex flex-col items-center py-1 px-2.5 rounded font-medium whitespace-nowrap shrink-0 transition-all ${
+                isActive ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <Icon className="w-4 h-4 mb-0.5" />
