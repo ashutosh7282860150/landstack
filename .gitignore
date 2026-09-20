@@ -2,16 +2,17 @@
 # Dependencies
 # ===========================
 node_modules/
+**/node_modules/
 .pnp
 .pnp.js
 
 # ===========================
 # Build Outputs
 # ===========================
-frontend/dist/
-frontend/build/
-backend/dist/
-backend/build/
+dist/
+build/
+**/dist/
+**/build/
 
 # ===========================
 # Environment Variables
@@ -38,7 +39,8 @@ pnpm-debug.log*
 # ===========================
 # Vite / Frontend
 # ===========================
-frontend/.vite/
+.vite/
+**/.vite/
 
 # ===========================
 # OS & Editor Files
