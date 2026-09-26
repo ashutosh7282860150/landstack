@@ -4,10 +4,10 @@
   "description": "Integrated GIS-based Digital Public Infrastructure for Land Governance (SIH Prototype)",
   "scripts": {
     "dev:backend": "node backend/server.js",
-    "dev:frontend": "cd frontend && npm.cmd run dev",
+    "dev:frontend": "cd frontend && npm run dev",
     "dev": "node start-all.js",
-    "build": "cd frontend && npm.cmd run build",
-    "install:all": "npm.cmd install && cd frontend && npm.cmd install && cd ../backend && npm.cmd install"
+    "build": "cd frontend && npm run build",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
   },
   "keywords": ["gis", "land-records", "ulpin", "bhu-aadhaar", "smart-india-hackathon", "digital-public-infrastructure"],
   "author": "Smart India Hackathon Team",

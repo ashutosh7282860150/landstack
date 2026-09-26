@@ -170,7 +170,7 @@ export const api = {
         { name: 'Registered Deed Copy', file: 'Deed_Uploaded.pdf', verified: true },
         { name: 'Buyer & Seller KYC Identity', file: 'KYC_Aadhaar.pdf', verified: true }
       ],
-      notes: data.notes || 'Online mutation application filed through LAND STACK DPI.'
+      notes: data.notes || 'Online mutation application filed through BHOO BHUMI DPI.'
     };
 
     apps.unshift(newApp);

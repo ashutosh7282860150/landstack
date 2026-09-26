@@ -2,18 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Smartphone, 
-  Fingerprint, 
-  ShieldCheck, 
+  Shield, 
   User, 
   Lock, 
   ArrowRight, 
   CheckCircle2, 
-  AlertCircle, 
-  Sparkles,
-  RefreshCw,
-  Building,
-  Key,
-  Shield
+  AlertCircle,
+  ShieldCheck
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useLandStack, ROLES } from '../context/LandStackContext';
@@ -23,30 +18,24 @@ export const AuthModal = () => {
     isAuthModalOpen, 
     setIsAuthModalOpen, 
     authModalMode, 
-    setAuthModalMode,
     loginUser,
     setCurrentRole,
     setActiveTab
   } = useLandStack();
 
-  // Tab: 'citizen' | 'admin' | 'register'
   const [activeTab, setActiveTabLocal] = useState('citizen');
-  // Citizen method: 'phone' | 'aadhaar'
   const [loginMethod, setLoginMethod] = useState('phone');
 
-  // Input states
   const [phoneInput, setPhoneInput] = useState('');
   const [aadhaarInput, setAadhaarInput] = useState('');
   const [adminIdInput, setAdminIdInput] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
 
-  // Register inputs
   const [regName, setRegName] = useState('');
   const [regPhone, setRegPhone] = useState('');
   const [regAadhaar, setRegAadhaar] = useState('');
   const [regState, setRegState] = useState('Maharashtra');
 
-  // OTP step
   const [isOtpStep, setIsOtpStep] = useState(false);
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', '']);
   const [generatedOtp, setGeneratedOtp] = useState('');
@@ -54,7 +43,6 @@ export const AuthModal = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [pendingUser, setPendingUser] = useState(null);
 
-  // Sync modal mode if changed externally
   useEffect(() => {
     if (authModalMode === 'register') {
       setActiveTabLocal('register');
@@ -63,7 +51,6 @@ export const AuthModal = () => {
     }
   }, [authModalMode]);
 
-  // Countdown timer for OTP
   useEffect(() => {
     let interval = null;
     if (isOtpStep && timer > 0) {
@@ -76,155 +63,136 @@ export const AuthModal = () => {
 
   if (!isAuthModalOpen) return null;
 
-  // Generate & Send OTP
   const handleSendOtp = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setErrorMsg('');
 
-    let userPayload = null;
-
     if (activeTab === 'citizen') {
-      if (loginMethod === 'phone') {
-        if (!phoneInput || phoneInput.length < 10) {
-          setErrorMsg('Please enter a valid 10-digit mobile number');
-          return;
-        }
-        userPayload = {
-          name: phoneInput.includes('98230') ? 'Rameshwar D. Patil' : 'Registered Landowner',
-          phone: phoneInput,
-          aadhaar: 'XXXXXXXX9284',
-          role: 'citizen',
-          isAuthenticated: true,
-          authMethod: 'Mobile OTP'
-        };
-      } else {
-        if (!aadhaarInput || aadhaarInput.length < 12) {
-          setErrorMsg('Please enter a valid 12-digit Aadhaar / VID number');
-          return;
-        }
-        userPayload = {
-          name: 'Aadhaar Verified Citizen',
-          phone: '+91 98230 91823',
-          aadhaar: `XXXXXXXX${aadhaarInput.slice(-4)}`,
-          role: 'citizen',
-          isAuthenticated: true,
-          authMethod: 'Aadhaar OTP'
-        };
-      }
-    } else if (activeTab === 'register') {
-      if (!regName || !regPhone) {
-        setErrorMsg('Please enter your full name and mobile number');
+      if (loginMethod === 'phone' && (!phoneInput || phoneInput.length < 10)) {
+        setErrorMsg('Please enter a valid 10-digit mobile number.');
         return;
       }
-      userPayload = {
+      if (loginMethod === 'aadhaar' && (!aadhaarInput || aadhaarInput.length < 12)) {
+        setErrorMsg('Please enter a valid 12-digit Aadhaar / UID number.');
+        return;
+      }
+
+      const mockOtp = String(Math.floor(100000 + Math.random() * 900000));
+      setGeneratedOtp(mockOtp);
+      setPendingUser({
+        name: loginMethod === 'phone' ? `Citizen (${phoneInput.slice(-4)})` : `Aadhaar Holder (${aadhaarInput.slice(-4)})`,
+        phone: phoneInput || '9823091823',
+        aadhaar: aadhaarInput ? `XXXXXXXX${aadhaarInput.slice(-4)}` : 'XXXXXXXX9284',
+        role: 'citizen'
+      });
+      setIsOtpStep(true);
+      setTimer(30);
+      setOtpCode([mockOtp[0], mockOtp[1], mockOtp[2], mockOtp[3], mockOtp[4], mockOtp[5]]);
+    } else if (activeTab === 'register') {
+      if (!regName || !regPhone || regPhone.length < 10) {
+        setErrorMsg('Please enter full name and valid 10-digit mobile number.');
+        return;
+      }
+
+      const mockOtp = String(Math.floor(100000 + Math.random() * 900000));
+      setGeneratedOtp(mockOtp);
+      setPendingUser({
         name: regName,
         phone: regPhone,
-        aadhaar: regAadhaar ? `XXXXXXXX${regAadhaar.slice(-4)}` : 'XXXXXXXX7812',
-        state: regState,
+        aadhaar: regAadhaar ? `XXXXXXXX${regAadhaar.slice(-4)}` : 'XXXXXXXX1122',
         role: 'citizen',
-        isAuthenticated: true,
-        authMethod: 'Registration OTP'
-      };
-    } else if (activeTab === 'admin') {
-      if (!adminIdInput) {
-        setErrorMsg('Please enter your Official Employee ID or Parichay ID');
-        return;
-      }
-      userPayload = {
-        name: 'Anand S. Kulkarni (Patwari / Tehsildar)',
-        employeeId: adminIdInput,
-        role: 'revenue_officer',
-        isAuthenticated: true,
-        authMethod: 'Govt SSO'
-      };
+        state: regState
+      });
+      setIsOtpStep(true);
+      setTimer(30);
+      setOtpCode([mockOtp[0], mockOtp[1], mockOtp[2], mockOtp[3], mockOtp[4], mockOtp[5]]);
     }
-
-    const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOtp(randomOtp);
-    setPendingUser(userPayload);
-    setIsOtpStep(true);
-    setTimer(30);
   };
 
-  // Handle individual OTP digit change
-  const handleOtpDigitChange = (index, value) => {
-    if (value.length > 1) {
-      value = value.slice(-1);
+  const handleVerifyOtp = (e) => {
+    e.preventDefault();
+    const entered = otpCode.join('');
+    if (entered !== generatedOtp && entered !== '123456') {
+      setErrorMsg('Invalid OTP entered. Try again or check demo code.');
+      return;
     }
-    const newOtp = [...otpCode];
-    newOtp[index] = value;
-    setOtpCode(newOtp);
 
-    // Auto-focus next input
+    if (pendingUser) {
+      loginUser(pendingUser);
+      const citizenRole = ROLES.find(r => r.id === 'citizen');
+      if (citizenRole) setCurrentRole(citizenRole);
+      setIsAuthModalOpen(false);
+      setIsOtpStep(false);
+      confetti({ particleCount: 75, spread: 60, origin: { y: 0.6 } });
+    }
+  };
+
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (!adminIdInput) {
+      setErrorMsg('Please enter official Government Employee ID / SSO login.');
+      return;
+    }
+
+    const adminUser = {
+      name: `Officer (${adminIdInput})`,
+      role: 'revenue_officer',
+      officialId: adminIdInput
+    };
+    loginUser(adminUser);
+    const officerRole = ROLES.find(r => r.id === 'revenue_officer');
+    if (officerRole) setCurrentRole(officerRole);
+    setActiveTab('officer_workflow');
+    setIsAuthModalOpen(false);
+    confetti({ particleCount: 75, spread: 60, origin: { y: 0.6 } });
+  };
+
+  const handleOtpDigitChange = (index, value) => {
+    if (value.length > 1) value = value.slice(-1);
+    const newCode = [...otpCode];
+    newCode[index] = value;
+    setOtpCode(newCode);
+
     if (value && index < 5) {
-      const nextInput = document.getElementById(`otp-input-${index + 1}`);
+      const nextInput = document.getElementById(`modal-otp-${index + 1}`);
       if (nextInput) nextInput.focus();
     }
   };
 
-  // Auto-fill Demo OTP
-  const handleAutoFillOtp = () => {
-    if (generatedOtp) {
-      setOtpCode(generatedOtp.split(''));
-    }
-  };
-
-  // Verify OTP & Login
-  const handleVerifyOtp = (e) => {
-    e.preventDefault();
-    const entered = otpCode.join('');
-    if (entered.length < 6) {
-      setErrorMsg('Please enter complete 6-digit OTP');
-      return;
-    }
-
-    // In demo, accept generated OTP or '123456'
-    if (entered === generatedOtp || entered === '123456') {
-      confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-      if (pendingUser?.role === 'revenue_officer' || pendingUser?.role === 'admin') {
-        const officerRole = ROLES.find(r => r.id === 'revenue_officer');
-        if (officerRole) setCurrentRole(officerRole);
-      }
-      loginUser(pendingUser);
-      setIsOtpStep(false);
-      setOtpCode(['', '', '', '', '', '']);
-    } else {
-      setErrorMsg('Incorrect OTP. Click "Auto-fill Demo OTP" to test.');
-    }
-  };
-
-  // Quick Demo Prefill helpers
-  const handleQuickCitizenDemo = () => {
+  const handleQuickDemoFillPhone = () => {
     setActiveTabLocal('citizen');
     setLoginMethod('phone');
     setPhoneInput('9823091823');
+    setErrorMsg('');
   };
 
-  const handleQuickAadhaarDemo = () => {
+  const handleQuickDemoFillAadhaar = () => {
     setActiveTabLocal('citizen');
     setLoginMethod('aadhaar');
-    setAadhaarInput('541289009284');
+    setAadhaarInput('465656565656');
+    setErrorMsg('');
   };
 
   const handleQuickAdminDemo = () => {
     setActiveTabLocal('admin');
     setAdminIdInput('REV-MH-PUN-091');
     setAdminPassword('GovTech@2026');
+    setErrorMsg('');
   };
 
   return (
-    <div className="fixed inset-0 z-[3000] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto text-xs text-slate-200">
-      <div className="relative w-full max-w-md max-h-[90vh] flex flex-col bg-slate-900 border border-slate-700 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-[3000] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto text-xs text-[#1f2937]">
+      <div className="relative w-full max-w-md bg-white border-2 border-slate-300 rounded-2xl shadow-2xl overflow-hidden font-sans max-h-[92vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
         
-        {/* Top Header */}
-        <div className="bg-slate-950 px-6 py-4 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
-              <Shield className="w-4 h-4" />
+        {/* Header Bar */}
+        <div className="bg-[#103b66] px-5 py-3.5 text-white flex items-center justify-between border-b-2 border-amber-600 shrink-0">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-8 h-8 rounded-lg bg-amber-600 flex items-center justify-center font-black text-white text-sm shadow-sm">
+              भू
             </div>
             <div>
-              <h2 className="font-extrabold text-white text-sm">LAND STACK Gateway</h2>
-              <p className="text-[10px] text-slate-400">Digital Public Infrastructure Authentication</p>
+              <h2 className="font-bold text-sm text-white">भू भूमि - राष्ट्रीय पोर्टल लॉगिन</h2>
+              <p className="text-[11px] text-slate-200">BHOO BHUMI Single Sign-On Gateway</p>
             </div>
           </div>
           <button
@@ -233,403 +201,323 @@ export const AuthModal = () => {
               setIsOtpStep(false);
               setErrorMsg('');
             }}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+            className="p-1 rounded-lg text-slate-200 hover:text-white hover:bg-white/10 transition-colors"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Content Container */}
-        <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1">
+        {/* Modal Body */}
+        <div className="p-5 space-y-4 overflow-y-auto flex-1">
           
           {!isOtpStep ? (
             <>
-              {/* Top Persona Tabs */}
-              <div className="grid grid-cols-3 gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+              {/* Persona Tabs */}
+              <div className="grid grid-cols-3 gap-1 bg-slate-100 p-1.5 rounded-xl border border-slate-300">
                 <button
                   type="button"
-                  onClick={() => {
-                    setActiveTabLocal('citizen');
-                    setErrorMsg('');
-                  }}
-                  className={`py-2 rounded-lg font-bold text-xs transition-all flex items-center justify-center space-x-1 ${
-                    activeTab === 'citizen'
-                      ? 'bg-emerald-500 text-slate-950 shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                  onClick={() => { setActiveTabLocal('citizen'); setErrorMsg(''); }}
+                  className={`py-2 rounded-lg font-bold text-xs transition-all ${
+                    activeTab === 'citizen' ? 'bg-[#103b66] text-white shadow-sm' : 'text-slate-700 hover:bg-slate-200'
                   }`}
                 >
-                  <User className="w-3.5 h-3.5" />
-                  <span>Citizen</span>
+                  📱 नागरिक (Citizen)
                 </button>
-
                 <button
                   type="button"
-                  onClick={() => {
-                    setActiveTabLocal('admin');
-                    setErrorMsg('');
-                  }}
-                  className={`py-2 rounded-lg font-bold text-xs transition-all flex items-center justify-center space-x-1 ${
-                    activeTab === 'admin'
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                  onClick={() => { setActiveTabLocal('admin'); setErrorMsg(''); }}
+                  className={`py-2 rounded-lg font-bold text-xs transition-all ${
+                    activeTab === 'admin' ? 'bg-[#103b66] text-white shadow-sm' : 'text-slate-700 hover:bg-slate-200'
                   }`}
                 >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Official</span>
+                  🏛️ अधिकारी (Officer)
                 </button>
-
                 <button
                   type="button"
-                  onClick={() => {
-                    setActiveTabLocal('register');
-                    setErrorMsg('');
-                  }}
-                  className={`py-2 rounded-lg font-bold text-xs transition-all flex items-center justify-center space-x-1 ${
-                    activeTab === 'register'
-                      ? 'bg-purple-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                  onClick={() => { setActiveTabLocal('register'); setErrorMsg(''); }}
+                  className={`py-2 rounded-lg font-bold text-xs transition-all ${
+                    activeTab === 'register' ? 'bg-[#103b66] text-white shadow-sm' : 'text-slate-700 hover:bg-slate-200'
                   }`}
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Register</span>
+                  + नया पंजीकरण
                 </button>
               </div>
 
-              {/* 1. Citizen Login Flow */}
+              {/* 1. Citizen Login */}
               {activeTab === 'citizen' && (
-                <form onSubmit={handleSendOtp} className="space-y-4">
-                  {/* Method toggle: Phone vs Aadhaar */}
-                  <div className="flex items-center justify-between text-[11px] pb-1 border-b border-slate-800">
-                    <span className="text-slate-400 font-medium">Authenticate Using:</span>
-                    <div className="flex space-x-2">
-                      <button
-                        type="button"
-                        onClick={() => setLoginMethod('phone')}
-                        className={`px-2 py-1 rounded-md font-semibold flex items-center space-x-1 ${
-                          loginMethod === 'phone'
-                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                            : 'text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        <Smartphone className="w-3 h-3" />
-                        <span>Mobile No</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setLoginMethod('aadhaar')}
-                        className={`px-2 py-1 rounded-md font-semibold flex items-center space-x-1 ${
-                          loginMethod === 'aadhaar'
-                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                            : 'text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        <Fingerprint className="w-3 h-3" />
-                        <span>Aadhaar / VID</span>
-                      </button>
-                    </div>
+                <form onSubmit={handleSendOtp} className="space-y-3.5">
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setLoginMethod('phone')}
+                      className={`flex-1 py-2 rounded-lg border text-xs font-semibold flex items-center justify-center space-x-1.5 transition-colors ${
+                        loginMethod === 'phone' ? 'border-[#103b66] bg-blue-50 text-[#103b66] font-bold' : 'border-slate-300 bg-white text-slate-700'
+                      }`}
+                    >
+                      <Smartphone className="w-3.5 h-3.5" />
+                      <span>Mobile Phone + OTP</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLoginMethod('aadhaar')}
+                      className={`flex-1 py-2 rounded-lg border text-xs font-semibold flex items-center justify-center space-x-1.5 transition-colors ${
+                        loginMethod === 'aadhaar' ? 'border-[#103b66] bg-blue-50 text-[#103b66] font-bold' : 'border-slate-300 bg-white text-slate-700'
+                      }`}
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>Aadhaar (UIDAI) + OTP</span>
+                    </button>
                   </div>
 
                   {loginMethod === 'phone' ? (
                     <div>
-                      <label className="text-slate-400 block mb-1">Mobile Phone Number:</label>
+                      <label className="block font-bold text-slate-700 mb-1 text-xs">
+                        10-Digit Registered Mobile Number *
+                      </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold font-mono">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono font-bold text-slate-500 text-xs">
                           +91
                         </span>
                         <input
                           type="tel"
                           maxLength="10"
-                          placeholder="98230 91823"
                           value={phoneInput}
-                          onChange={(e) => setPhoneInput(e.target.value.replace(/\D/g, ''))}
-                          className="w-full pl-12 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white font-mono text-sm tracking-wider focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          onChange={(e) => setPhoneInput(e.target.value)}
+                          placeholder="00000 00000"
+                          className="w-full pl-12 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 font-mono focus:border-[#103b66] focus:outline-none"
                         />
                       </div>
-                      <p className="text-[10px] text-slate-500 mt-1">
-                        A 6-digit OTP will be sent to your registered mobile.
-                      </p>
                     </div>
                   ) : (
                     <div>
-                      <label className="text-slate-400 block mb-1">12-Digit Aadhaar / VID Number:</label>
-                      <div className="relative">
-                        <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <input
-                          type="text"
-                          maxLength="12"
-                          placeholder="5412 8900 9284"
-                          value={aadhaarInput}
-                          onChange={(e) => setAadhaarInput(e.target.value.replace(/\D/g, ''))}
-                          className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white font-mono text-sm tracking-wider focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                        />
-                      </div>
-                      <p className="text-[10px] text-slate-500 mt-1">
-                        Secure UIDAI Aadhaar OTP verification simulation.
-                      </p>
+                      <label className="block font-bold text-slate-700 mb-1 text-xs">
+                        12-Digit Aadhaar / VID Number *
+                      </label>
+                      <input
+                        type="text"
+                        maxLength="12"
+                        value={aadhaarInput}
+                        onChange={(e) => setAadhaarInput(e.target.value)}
+                        placeholder="0000 0000 0000"
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 font-mono focus:border-[#103b66] focus:outline-none"
+                      />
                     </div>
                   )}
 
                   {errorMsg && (
-                    <div className="p-2.5 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-[11px] flex items-center space-x-1.5">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-400" />
+                    <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center space-x-1.5">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
                       <span>{errorMsg}</span>
                     </div>
                   )}
 
-                  <button
-                    type="submit"
-                    className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs rounded-xl shadow-lg flex items-center justify-center space-x-2 transition-all cursor-pointer"
-                  >
-                    <span>Get Verification OTP</span>
+                  <button type="submit" className="gov-btn-primary w-full py-2.5 text-xs justify-center font-bold">
+                    <span>Send OTP Code</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
 
-                  {/* Quick One-Click Demo Logins */}
-                  <div className="pt-3 border-t border-slate-800 space-y-1.5">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">
-                      Quick Demo Autofill:
-                    </span>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={handleQuickCitizenDemo}
-                        className="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-[11px] transition-colors"
-                      >
-                        <span className="text-emerald-400 font-bold block">👤 Rameshwar Patil</span>
-                        <span className="text-slate-400 text-[10px] font-mono">+91 9823091823</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleQuickAadhaarDemo}
-                        className="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-[11px] transition-colors"
-                      >
-                        <span className="text-blue-400 font-bold block">🆔 Aadhaar Demo</span>
-                        <span className="text-slate-400 text-[10px] font-mono">541289009284</span>
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              )}
-
-              {/* 2. Official / Admin Login Flow */}
-              {activeTab === 'admin' && (
-                <form onSubmit={handleSendOtp} className="space-y-4">
-                  <div>
-                    <label className="text-slate-400 block mb-1">Official Employee ID / Parichay SSO:</label>
-                    <div className="relative">
-                      <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400" />
-                      <input
-                        type="text"
-                        placeholder="e.g. REV-MH-PUN-091"
-                        value={adminIdInput}
-                        onChange={(e) => setAdminIdInput(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-slate-400 block mb-1">Official Password / Security PIN:</label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <input
-                        type="password"
-                        placeholder="••••••••"
-                        value={adminPassword}
-                        onChange={(e) => setAdminPassword(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  </div>
-
-                  {errorMsg && (
-                    <div className="p-2.5 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-[11px] flex items-center space-x-1.5">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-400" />
-                      <span>{errorMsg}</span>
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg flex items-center justify-center space-x-2 transition-all cursor-pointer"
-                  >
-                    <Key className="w-4 h-4" />
-                    <span>Proceed to 2FA OTP Authentication</span>
-                  </button>
-
-                  {/* Quick Admin Fill */}
-                  <div className="pt-2 border-t border-slate-800">
-                    <button
-                      type="button"
-                      onClick={handleQuickAdminDemo}
-                      className="w-full p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-[11px] flex justify-between items-center"
+                  {/* Quick Fill Demo Helper Links in masked/XXXX form */}
+                  <div className="pt-2 flex flex-wrap items-center justify-center gap-2 border-t border-slate-200 text-[11px]">
+                    <button 
+                      type="button" 
+                      onClick={handleQuickDemoFillPhone} 
+                      className="text-blue-800 font-bold hover:underline"
                     >
-                      <span className="text-blue-400 font-bold">🏛️ Revenue Officer (Patwari Hinjawadi)</span>
-                      <span className="text-slate-400 font-mono text-[10px]">Autofill</span>
+                      ⚡ Quick Fill Demo Citizen (98XXXXXXXX)
+                    </button>
+                    <span className="text-slate-300">|</span>
+                    <button 
+                      type="button" 
+                      onClick={handleQuickDemoFillAadhaar} 
+                      className="text-blue-800 font-bold hover:underline"
+                    >
+                      ⚡ Quick Fill Demo Aadhaar (XXXX-XXXX-XXXX)
                     </button>
                   </div>
                 </form>
               )}
 
-              {/* 3. New Citizen Registration */}
-              {activeTab === 'register' && (
-                <form onSubmit={handleSendOtp} className="space-y-3">
+              {/* 2. Officer SSO Login */}
+              {activeTab === 'admin' && (
+                <form onSubmit={handleAdminLogin} className="space-y-3.5">
                   <div>
-                    <label className="text-slate-400 block mb-0.5">Full Legal Name (as per Land Record):</label>
+                    <label className="block font-bold text-slate-700 mb-1 text-xs">
+                      Official Government Employee ID / Parichay SSO *
+                    </label>
                     <input
                       type="text"
-                      required
-                      placeholder="e.g. Rameshwar Dattatray Patil"
-                      value={regName}
-                      onChange={(e) => setRegName(e.target.value)}
-                      className="w-full p-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs"
+                      value={adminIdInput}
+                      onChange={(e) => setAdminIdInput(e.target.value)}
+                      placeholder="REV-XX-XXX-000"
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 font-mono focus:border-[#103b66] focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1 text-xs">
+                      SSO Official Password *
+                    </label>
+                    <input
+                      type="password"
+                      value={adminPassword}
+                      onChange={(e) => setAdminPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 font-mono focus:border-[#103b66] focus:outline-none"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="text-slate-400 block mb-0.5">Mobile Phone No:</label>
-                      <input
-                        type="tel"
-                        required
-                        maxLength="10"
-                        placeholder="9823091823"
-                        value={regPhone}
-                        onChange={(e) => setRegPhone(e.target.value.replace(/\D/g, ''))}
-                        className="w-full p-2 bg-slate-950 border border-slate-700 rounded-xl text-white font-mono text-xs"
-                      />
+                  {errorMsg && (
+                    <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center space-x-1.5">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{errorMsg}</span>
                     </div>
-                    <div>
-                      <label className="text-slate-400 block mb-0.5">Aadhaar (Optional):</label>
-                      <input
-                        type="text"
-                        maxLength="12"
-                        placeholder="541289009284"
-                        value={regAadhaar}
-                        onChange={(e) => setRegAadhaar(e.target.value.replace(/\D/g, ''))}
-                        className="w-full p-2 bg-slate-950 border border-slate-700 rounded-xl text-white font-mono text-xs"
-                      />
-                    </div>
-                  </div>
+                  )}
 
+                  <button type="submit" className="gov-btn-orange w-full py-2.5 text-xs justify-center font-bold">
+                    <Lock className="w-4 h-4" />
+                    <span>Official SSO Sign In</span>
+                  </button>
+
+                  <div className="pt-2 text-center border-t border-slate-200">
+                    <button 
+                      type="button" 
+                      onClick={handleQuickAdminDemo} 
+                      className="text-blue-800 font-bold hover:underline text-[11px]"
+                    >
+                      ⚡ Quick Fill Demo Tehsildar (REV-MH-PUN-XXX)
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* 3. Citizen Registration */}
+              {activeTab === 'register' && (
+                <form onSubmit={handleSendOtp} className="space-y-3">
                   <div>
-                    <label className="text-slate-400 block mb-0.5">State / Jurisdiction:</label>
-                    <select
-                      value={regState}
-                      onChange={(e) => setRegState(e.target.value)}
-                      className="w-full p-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs"
+                    <label className="block font-bold text-slate-700 mb-1 text-xs">
+                      Full Name (As on Aadhaar Record) *
+                    </label>
+                    <input
+                      type="text"
+                      value={regName}
+                      onChange={(e) => setRegName(e.target.value)}
+                      placeholder="XXXX XXXXX XXXXX"
+                      className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:border-[#103b66] focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1 text-xs">
+                      Mobile Phone *
+                    </label>
+                    <input
+                      type="tel"
+                      maxLength="10"
+                      value={regPhone}
+                      onChange={(e) => setRegPhone(e.target.value)}
+                      placeholder="00000 00000"
+                      className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 font-mono focus:border-[#103b66] focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1 text-xs">
+                      Aadhaar Number (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      maxLength="12"
+                      value={regAadhaar}
+                      onChange={(e) => setRegAadhaar(e.target.value)}
+                      placeholder="0000 0000 0000"
+                      className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 font-mono focus:border-[#103b66] focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1 text-xs">
+                      State Jurisdiction *
+                    </label>
+                    <select 
+                      value={regState} 
+                      onChange={(e) => setRegState(e.target.value)} 
+                      className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:border-[#103b66] focus:outline-none"
                     >
                       <option value="Maharashtra">Maharashtra</option>
                       <option value="Karnataka">Karnataka</option>
                       <option value="Rajasthan">Rajasthan</option>
                       <option value="Uttar Pradesh">Uttar Pradesh</option>
                       <option value="Gujarat">Gujarat</option>
+                      <option value="Madhya Pradesh">Madhya Pradesh</option>
+                      <option value="Tamil Nadu">Tamil Nadu</option>
+                      <option value="Haryana">Haryana</option>
+                      <option value="Bihar">Bihar</option>
                       <option value="Telangana">Telangana</option>
                     </select>
                   </div>
 
                   {errorMsg && (
-                    <div className="p-2 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-[11px] flex items-center space-x-1.5">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-400" />
-                      <span>{errorMsg}</span>
+                    <div className="p-2 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
+                      {errorMsg}
                     </div>
                   )}
 
-                  <button
-                    type="submit"
-                    className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg flex items-center justify-center space-x-2"
-                  >
-                    <span>Send Verification OTP</span>
-                    <ArrowRight className="w-4 h-4" />
+                  <button type="submit" className="gov-btn-primary w-full py-2 text-xs justify-center font-bold">
+                    <span>Register & Send OTP</span>
                   </button>
                 </form>
               )}
             </>
           ) : (
-            /* ================= OTP VERIFICATION VIEW ================= */
-            <form onSubmit={handleVerifyOtp} className="space-y-5 animate-in fade-in duration-200">
-              <div className="text-center space-y-1">
-                <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center">
-                  <Smartphone className="w-6 h-6 animate-bounce" />
+            /* OTP Verification Screen */
+            <form onSubmit={handleVerifyOtp} className="space-y-4">
+              <div className="bg-amber-50 border border-amber-300 p-3 rounded-xl text-center">
+                <span className="font-bold text-amber-900 block text-xs">
+                  Enter 6-Digit OTP Sent to Your Registered Mobile
+                </span>
+                <div className="bg-amber-100 border border-amber-400 py-1 px-2 rounded-lg mt-1.5 inline-block">
+                  <span className="font-mono font-black text-amber-900 text-sm tracking-widest">
+                    DEMO OTP CODE: {generatedOtp}
+                  </span>
                 </div>
-                <h3 className="font-bold text-white text-base">Enter 6-Digit OTP</h3>
-                <p className="text-slate-400 text-xs">
-                  We've sent a 6-digit verification code for <strong className="text-emerald-400 font-mono">{pendingUser?.phone || pendingUser?.name}</strong>
+                <p className="text-[10px] text-slate-500 mt-1">
+                  Auto-filled for demonstration. You can click 'Verify & Access'.
                 </p>
               </div>
 
-              {/* Simulated OTP Notification Banner */}
-              <div className="p-3 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Sparkles className="w-4 h-4 text-emerald-400 animate-pulse" />
-                  <span className="text-[11px] text-emerald-300">
-                    Demo Simulated OTP: <strong className="font-mono text-white text-xs">{generatedOtp}</strong>
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleAutoFillOtp}
-                  className="px-2.5 py-1 bg-emerald-500 text-slate-950 font-bold rounded-lg text-[10px] shadow"
-                >
-                  Auto-fill
-                </button>
-              </div>
-
-              {/* 6 OTP Input Boxes */}
-              <div className="flex justify-center gap-2">
+              <div className="flex justify-center gap-1.5">
                 {otpCode.map((digit, i) => (
                   <input
                     key={i}
-                    id={`otp-input-${i}`}
+                    id={`modal-otp-${i}`}
                     type="text"
                     maxLength="1"
                     value={digit}
                     onChange={(e) => handleOtpDigitChange(i, e.target.value)}
-                    className="w-11 h-12 text-center text-lg font-mono font-bold bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-10 h-10 sm:w-11 sm:h-11 text-center text-lg font-mono font-bold bg-white border-2 border-slate-300 rounded-lg text-slate-900 focus:border-[#103b66] focus:outline-none"
                   />
                 ))}
               </div>
 
-              {errorMsg && (
-                <div className="p-2.5 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-[11px] flex items-center space-x-1.5 text-center justify-center">
-                  <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-400" />
-                  <span>{errorMsg}</span>
-                </div>
-              )}
+              {errorMsg && <p className="text-red-700 font-bold text-xs text-center">{errorMsg}</p>}
 
-              <button
-                type="submit"
-                className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs rounded-xl shadow-lg flex items-center justify-center space-x-2 transition-all cursor-pointer"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Verify & Access Land Stack DPI</span>
+              <button type="submit" className="gov-btn-primary w-full py-2.5 text-xs justify-center font-bold">
+                <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+                <span>Verify & Access Bhoo Bhumi Portal</span>
               </button>
 
-              <div className="flex justify-between items-center text-[11px] text-slate-400 pt-2 border-t border-slate-800">
+              <div className="flex items-center justify-between text-[11px] pt-1 text-slate-600">
                 <button
                   type="button"
-                  onClick={() => setIsOtpStep(false)}
-                  className="hover:text-white underline"
+                  onClick={() => { setIsOtpStep(false); setErrorMsg(''); }}
+                  className="text-[#103b66] font-semibold hover:underline"
                 >
-                  Change Mobile / Number
+                  ← Change Number
                 </button>
                 <span>
-                  {timer > 0 ? `Resend in ${timer}s` : (
-                    <button
-                      type="button"
-                      onClick={handleSendOtp}
-                      className="text-emerald-400 font-bold hover:underline"
-                    >
-                      Resend OTP
-                    </button>
-                  )}
+                  Resend in: <strong className="font-mono text-amber-700">{timer}s</strong>
                 </span>
               </div>
             </form>
           )}
 
         </div>
-
       </div>
     </div>
   );

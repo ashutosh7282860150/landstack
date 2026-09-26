@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   MapContainer, 
   TileLayer, 
@@ -6,6 +6,7 @@ import {
   Marker, 
   Popup, 
   Tooltip, 
+  Circle,
   useMap, 
   useMapEvents 
 } from 'react-leaflet';
@@ -13,22 +14,24 @@ import L from 'leaflet';
 import { 
   Search, 
   Layers, 
-  Filter, 
   Maximize2, 
-  Compass, 
-  Ruler, 
-  Eye, 
-  CheckCircle2, 
-  AlertTriangle, 
-  RotateCcw,
-  Sparkles,
+  Ruler,
   MapPin,
-  ChevronDown,
-  Info
+  Globe,
+  Filter,
+  Info,
+  Compass,
+  Crosshair,
+  Navigation,
+  Eye,
+  CheckCircle2,
+  AlertTriangle,
+  Building,
+  CreditCard,
+  Scale
 } from 'lucide-react';
 import { useLandStack } from '../context/LandStackContext';
 import { MapParcelModal } from './MapParcelModal';
-import { formatArea, getRiskBadgeColor, getLandUseBadge } from '../utils/formatters';
 
 // Fix default Leaflet icon paths in Vite
 delete L.Icon.Default.prototype._getIconUrl;
@@ -45,7 +48,7 @@ function MapController({ center, zoom, bounds }) {
     if (bounds) {
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 17 });
     } else if (center) {
-      map.flyTo(center, zoom || 15, { duration: 1.2 });
+      map.flyTo(center, zoom || 13, { duration: 1.2 });
     }
   }, [center, zoom, bounds, map]);
   return null;
@@ -67,83 +70,127 @@ export const MapView = () => {
   const { 
     parcels, 
     selectedParcel, 
-    setSelectedParcel, 
+    setSelectedParcel,
     selectParcel,
-    filters,
-    setFilters,
-    t
+    showToast
   } = useLandStack();
 
   const [activeParcel, setActiveParcel] = useState(selectedParcel || null);
-  const [mapCenter, setMapCenter] = useState([18.5912, 73.7389]); // Default to Pune
-  const [mapZoom, setMapZoom] = useState(13);
+  const [mapCenter, setMapCenter] = useState([20.5937, 78.9629]); // All-India Geographic Center
+  const [mapZoom, setMapZoom] = useState(5);
   const [mapBounds, setMapBounds] = useState(null);
 
-  // Search & Filters
+  // Search & Hierarchical Live Location Selectors
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedState, setSelectedState] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
+  const [selectedTaluka, setSelectedTaluka] = useState('');
+  const [selectedVillage, setSelectedVillage] = useState('');
+  
+  // Categorical Filters
   const [selectedLandUse, setSelectedLandUse] = useState('All');
   const [selectedRiskFilter, setSelectedRiskFilter] = useState('All');
 
-  // Map Basemap Tile Layer
-  const [baseTile, setBaseTile] = useState('cartoDark'); // 'osm' | 'cartoDark' | 'satellite'
-  const [showZoningLayer, setShowZoningLayer] = useState(true);
-  const [layerOpacity, setLayerOpacity] = useState(0.55);
+  // Map Basemap Tile Layer (Clean English Map Services)
+  const [baseTile, setBaseTile] = useState('osm'); // 'osm' | 'satellite' | 'topo'
+  const [layerOpacity, setLayerOpacity] = useState(0.70);
 
   // Measurement Tool State
   const [isMeasuring, setIsMeasuring] = useState(false);
   const [measurePoints, setMeasurePoints] = useState([]);
 
-  // Available States and cascading Districts from parcels dataset
+  // Live GPS Geolocation State
+  const [userLocation, setUserLocation] = useState(null);
+  const [isLocating, setIsLocating] = useState(false);
+
+  // 1. Cascading States List
   const states = useMemo(() => {
-    const s = new Set(parcels.map(p => p.location.state));
-    return Array.from(s);
+    const s = new Set(parcels.map(p => p.location?.state).filter(Boolean));
+    return Array.from(s).sort();
   }, [parcels]);
 
+  // 2. Cascading Districts List
   const districts = useMemo(() => {
-    if (!selectedState) {
-      const d = new Set(parcels.map(p => p.location.district));
-      return Array.from(d);
+    let filtered = parcels;
+    if (selectedState) {
+      filtered = parcels.filter(p => p.location?.state === selectedState);
     }
-    const d = new Set(parcels.filter(p => p.location.state === selectedState).map(p => p.location.district));
-    return Array.from(d);
+    const d = new Set(filtered.map(p => p.location?.district).filter(Boolean));
+    return Array.from(d).sort();
   }, [parcels, selectedState]);
 
-  // Filtered Parcels
+  // 3. Cascading Blocks / Talukas List
+  const talukas = useMemo(() => {
+    let filtered = parcels;
+    if (selectedState) {
+      filtered = filtered.filter(p => p.location?.state === selectedState);
+    }
+    if (selectedDistrict) {
+      filtered = filtered.filter(p => p.location?.district === selectedDistrict);
+    }
+    const t = new Set(filtered.map(p => p.location?.taluka).filter(Boolean));
+    return Array.from(t).sort();
+  }, [parcels, selectedState, selectedDistrict]);
+
+  // 4. Cascading Villages List
+  const villages = useMemo(() => {
+    let filtered = parcels;
+    if (selectedState) {
+      filtered = filtered.filter(p => p.location?.state === selectedState);
+    }
+    if (selectedDistrict) {
+      filtered = filtered.filter(p => p.location?.district === selectedDistrict);
+    }
+    if (selectedTaluka) {
+      filtered = filtered.filter(p => p.location?.taluka === selectedTaluka);
+    }
+    const v = new Set(filtered.map(p => p.location?.village).filter(Boolean));
+    return Array.from(v).sort();
+  }, [parcels, selectedState, selectedDistrict, selectedTaluka]);
+
+  // Comprehensive Filtered Parcels Array
   const filteredParcels = useMemo(() => {
-    return parcels.filter(p => {
-      // Search term query
-      if (searchTerm) {
-        const q = searchTerm.toLowerCase().trim();
-        const matches = 
-          p.ulpin.toLowerCase().includes(q) ||
-          p.bhuAadhaar.toLowerCase().includes(q) ||
-          p.surveyNo.toLowerCase().includes(q) ||
-          p.location.village.toLowerCase().includes(q) ||
-          p.location.district.toLowerCase().includes(q) ||
-          p.revenueRecords?.owners?.some(o => o.name.toLowerCase().includes(q));
-        if (!matches) return false;
+    return parcels.filter((parcel) => {
+      const loc = parcel.location || {};
+
+      // Search Query Matching
+      if (searchTerm.trim()) {
+        const q = searchTerm.toLowerCase();
+        const matchesUlpin = parcel.ulpin?.toLowerCase().includes(q);
+        const matchesBhuAadhaar = parcel.bhuAadhaar?.toLowerCase().includes(q);
+        const matchesSurvey = parcel.surveyNo?.toLowerCase().includes(q);
+        const matchesKhasra = parcel.khasraNo?.toLowerCase().includes(q);
+        const matchesPlot = parcel.plotNo?.toLowerCase().includes(q);
+        const matchesOwner = parcel.revenueRecords?.owners?.some(o => o.name.toLowerCase().includes(q));
+        const matchesState = loc.state?.toLowerCase().includes(q);
+        const matchesDistrict = loc.district?.toLowerCase().includes(q);
+        const matchesTaluka = loc.taluka?.toLowerCase().includes(q);
+        const matchesVillage = loc.village?.toLowerCase().includes(q);
+        const matchesBank = parcel.encumbrance?.bankName?.toLowerCase().includes(q);
+
+        if (!matchesUlpin && !matchesBhuAadhaar && !matchesSurvey && !matchesKhasra && !matchesPlot && !matchesOwner && !matchesState && !matchesDistrict && !matchesTaluka && !matchesVillage && !matchesBank) {
+          return false;
+        }
       }
 
-      // State
-      if (selectedState && p.location.state !== selectedState) return false;
+      // Cascading Location Filters
+      if (selectedState && loc.state !== selectedState) return false;
+      if (selectedDistrict && loc.district !== selectedDistrict) return false;
+      if (selectedTaluka && loc.taluka !== selectedTaluka) return false;
+      if (selectedVillage && loc.village !== selectedVillage) return false;
 
-      // District
-      if (selectedDistrict && p.location.district !== selectedDistrict) return false;
+      // Land Use Filter
+      if (selectedLandUse !== 'All' && parcel.landUseCategory !== selectedLandUse) return false;
 
-      // Land Use
-      if (selectedLandUse !== 'All' && p.landUseCategory !== selectedLandUse) return false;
-
-      // Risk Filter
-      if (selectedRiskFilter === 'Clear' && p.litigation?.hasLitigation) return false;
-      if (selectedRiskFilter === 'Stayed' && !p.litigation?.hasLitigation) return false;
+      // Risk / Title Status Filter
+      if (selectedRiskFilter === 'Clear' && parcel.litigation?.hasLitigation) return false;
+      if (selectedRiskFilter === 'Stayed' && !parcel.litigation?.hasLitigation) return false;
 
       return true;
     });
-  }, [parcels, searchTerm, selectedState, selectedDistrict, selectedLandUse, selectedRiskFilter]);
+  }, [parcels, searchTerm, selectedState, selectedDistrict, selectedTaluka, selectedVillage, selectedLandUse, selectedRiskFilter]);
 
-  // When selectedParcel changes from outside (e.g. from Hero), focus map on it
+  // Sync selectedParcel from global context into activeParcel
   useEffect(() => {
     if (selectedParcel) {
       setActiveParcel(selectedParcel);
@@ -169,9 +216,13 @@ export const MapView = () => {
     return geometry.coordinates[0].map(([lng, lat]) => [lat, lng]);
   };
 
-  // Reset to all parcels extent
+  // Reset to all visible parcels extent
   const handleZoomToAll = () => {
-    if (filteredParcels.length === 0) return;
+    if (filteredParcels.length === 0) {
+      setMapCenter([20.5937, 78.9629]);
+      setMapZoom(5);
+      return;
+    }
     const allCoords = [];
     filteredParcels.forEach(p => {
       const coords = getLeafletCoords(p.geometry);
@@ -183,136 +234,291 @@ export const MapView = () => {
     }
   };
 
+  // Reset all filters to default
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setSelectedState('');
+    setSelectedDistrict('');
+    setSelectedTaluka('');
+    setSelectedVillage('');
+    setSelectedLandUse('All');
+    setSelectedRiskFilter('All');
+    setMapCenter([20.5937, 78.9629]);
+    setMapZoom(5);
+    setMapBounds(null);
+  };
+
+  // Live GPS Browser Geolocation
+  const handleGetLiveGpsLocation = () => {
+    if (!navigator.geolocation) {
+      showToast('Geolocation is not supported by your browser.', 'error');
+      return;
+    }
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const coords = [pos.coords.latitude, pos.coords.longitude];
+        setUserLocation({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracy: pos.coords.accuracy
+        });
+        setMapCenter(coords);
+        setMapZoom(16);
+        setIsLocating(false);
+        showToast(`Located your live GPS position (${coords[0].toFixed(4)}, ${coords[1].toFixed(4)})`, 'success');
+      },
+      (err) => {
+        setIsLocating(false);
+        // Fallback to sample center if permission denied
+        setMapCenter([18.5912, 73.7389]);
+        setMapZoom(15);
+        showToast('GPS access permission denied or unavailable. Centered on Hinjawadi.', 'info');
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
   // Measurement Point Added
   const handlePointAdded = (point) => {
     setMeasurePoints(prev => [...prev, point]);
   };
 
-  // Calculate measured area if > 2 points
-  const calculatedMeasureArea = useMemo(() => {
-    if (measurePoints.length < 3) return null;
-    try {
-      const latlngs = measurePoints.map(p => L.latLng(p[0], p[1]));
-      const areaM2 = L.GeometryUtil ? L.GeometryUtil.geodesicArea(latlngs) : 0;
-      return {
-        sqm: Math.round(areaM2),
-        acres: (areaM2 * 0.000247105).toFixed(3)
-      };
-    } catch {
-      return null;
-    }
-  }, [measurePoints]);
+  // Calculate stats for visible filtered parcels
+  const totalVisibleAcres = useMemo(() => {
+    return filteredParcels.reduce((acc, p) => acc + (p.spatialAttributes?.areaAcres || 0), 0).toFixed(2);
+  }, [filteredParcels]);
 
+  // Clean English Map Tiles
   const tileUrls = {
-    cartoDark: {
-      url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap contributors'
-    },
     osm: {
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      attribution: '&copy; OpenStreetMap contributors'
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     },
     satellite: {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+      attribution: 'Tiles &copy; Esri World Imagery'
+    },
+    topo: {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+      attribution: 'Tiles &copy; Esri World Topo Map'
     }
   };
 
   return (
-    <div className="relative w-full h-[calc(100vh-7.5rem)] lg:h-[calc(100vh-4rem)] min-h-[500px] flex flex-col bg-slate-950 overflow-hidden">
+    <div className="relative w-full h-[calc(100vh-8rem)] lg:h-[calc(100vh-6rem)] min-h-[600px] flex flex-col bg-slate-900/20 backdrop-blur-sm overflow-hidden font-sans">
       
-      {/* Top Filter & GIS Navigation Bar */}
-      <div className="bg-slate-900 border-b border-slate-800 p-2 sm:p-3 z-20 shadow-lg shrink-0">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 text-xs">
+      {/* 1. GIS Header: English Search & Cascading State/District/Block/Village Live Selectors */}
+      <div className="bg-[#103b66] border-b border-[#0a2540] p-3 text-white z-20 shadow-md shrink-0">
+        <div className="max-w-7xl mx-auto flex flex-col space-y-2">
           
-          <div className="flex items-center gap-2 flex-1">
-            {/* Search Box */}
-            <div className="relative flex-1 min-w-[180px] max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+          {/* Top Row: Search & Location Selectors */}
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2 text-xs">
+            
+            {/* Search Input Bar */}
+            <div className="relative flex-1 min-w-[220px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={t('map.searchPlaceholder')}
-                className="w-full pl-8 pr-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="Search ULPIN, Survey Number, Khasra, Owner Name, Village, Block, State..."
+                className="w-full pl-9 pr-3 py-1.5 bg-white text-slate-900 rounded text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
               />
             </div>
 
-            {/* Quick Stats Pill */}
-            <div className="flex items-center space-x-1.5 bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-800 text-[11px] font-mono shrink-0">
-              <span className="text-slate-400 hidden sm:inline">{t('map.visibleCadastre')}</span>
-              <span className="text-emerald-400 font-bold">{filteredParcels.length} <span className="hidden sm:inline">Parcels</span></span>
+            {/* Hierarchical Live Location Selectors */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none shrink-0">
+              
+              {/* 1. State Selector */}
+              <select
+                value={selectedState}
+                onChange={(e) => {
+                  const stateVal = e.target.value;
+                  setSelectedState(stateVal);
+                  setSelectedDistrict('');
+                  setSelectedTaluka('');
+                  setSelectedVillage('');
+                  
+                  if (stateVal) {
+                    const match = parcels.find(p => p.location?.state === stateVal);
+                    if (match?.location?.center) {
+                      setMapCenter(match.location.center);
+                      setMapZoom(8);
+                    }
+                  } else {
+                    setMapCenter([20.5937, 78.9629]);
+                    setMapZoom(5);
+                  }
+                }}
+                className="px-2.5 py-1.5 bg-white text-slate-900 border border-slate-300 rounded text-xs font-semibold focus:outline-none shrink-0"
+              >
+                <option value="">All States ({states.length})</option>
+                {states.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+
+              {/* 2. District Selector */}
+              <select
+                value={selectedDistrict}
+                onChange={(e) => {
+                  const distVal = e.target.value;
+                  setSelectedDistrict(distVal);
+                  setSelectedTaluka('');
+                  setSelectedVillage('');
+
+                  if (distVal) {
+                    const match = parcels.find(p => p.location?.district === distVal);
+                    if (match?.location?.center) {
+                      setMapCenter(match.location.center);
+                      setMapZoom(11);
+                    }
+                  }
+                }}
+                className="px-2.5 py-1.5 bg-white text-slate-900 border border-slate-300 rounded text-xs font-semibold focus:outline-none shrink-0"
+              >
+                <option value="">All Districts ({districts.length})</option>
+                {districts.map(d => <option key={d} value={d}>{d}</option>)}
+              </select>
+
+              {/* 3. Block / Tehsil / Taluka Selector */}
+              <select
+                value={selectedTaluka}
+                onChange={(e) => {
+                  const talukaVal = e.target.value;
+                  setSelectedTaluka(talukaVal);
+                  setSelectedVillage('');
+
+                  if (talukaVal) {
+                    const match = parcels.find(p => p.location?.taluka === talukaVal);
+                    if (match?.location?.center) {
+                      setMapCenter(match.location.center);
+                      setMapZoom(13);
+                    }
+                  }
+                }}
+                className="px-2.5 py-1.5 bg-white text-slate-900 border border-slate-300 rounded text-xs font-semibold focus:outline-none shrink-0"
+              >
+                <option value="">All Blocks / Tehsils ({talukas.length})</option>
+                {talukas.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+
+              {/* 4. Village Selector */}
+              <select
+                value={selectedVillage}
+                onChange={(e) => {
+                  const villageVal = e.target.value;
+                  setSelectedVillage(villageVal);
+
+                  if (villageVal) {
+                    const match = parcels.find(p => p.location?.village === villageVal);
+                    if (match?.location?.center) {
+                      setMapCenter(match.location.center);
+                      setMapZoom(15);
+                    }
+                  }
+                }}
+                className="px-2.5 py-1.5 bg-white text-slate-900 border border-slate-300 rounded text-xs font-semibold focus:outline-none shrink-0"
+              >
+                <option value="">All Villages ({villages.length})</option>
+                {villages.map(v => <option key={v} value={v}>{v}</option>)}
+              </select>
+
+              {/* Land Classification Filter */}
+              <select
+                value={selectedLandUse}
+                onChange={(e) => setSelectedLandUse(e.target.value)}
+                className="px-2 py-1.5 bg-white text-slate-900 border border-slate-300 rounded text-xs focus:outline-none shrink-0"
+              >
+                <option value="All">All Land Uses</option>
+                <option value="Agricultural">Agricultural</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Residential">Residential</option>
+                <option value="Industrial">Industrial</option>
+                <option value="Institutional">Institutional</option>
+                <option value="Protected / Government">Protected / Govt</option>
+              </select>
+
+              {/* Title Status Filter */}
+              <select
+                value={selectedRiskFilter}
+                onChange={(e) => setSelectedRiskFilter(e.target.value)}
+                className="px-2 py-1.5 bg-white text-slate-900 border border-slate-300 rounded text-xs focus:outline-none shrink-0"
+              >
+                <option value="All">All Title Statuses</option>
+                <option value="Clear">Clear Titles Only</option>
+                <option value="Stayed">Court Stay Flagged</option>
+              </select>
+
+              {/* Live GPS Button */}
+              <button
+                onClick={handleGetLiveGpsLocation}
+                className="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded text-xs font-bold shrink-0 flex items-center gap-1 transition-colors"
+                title="Detect and Zoom to My Live GPS Location"
+              >
+                <Crosshair className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">My Live Location</span>
+              </button>
+
+              {(selectedState || selectedDistrict || selectedTaluka || selectedVillage || selectedLandUse !== 'All' || selectedRiskFilter !== 'All' || searchTerm) && (
+                <button
+                  onClick={handleResetFilters}
+                  className="px-2.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded text-xs font-bold shrink-0 transition-colors"
+                >
+                  Reset
+                </button>
+              )}
             </div>
+
           </div>
 
-          {/* Cascading Location Selectors */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none shrink-0">
-            {/* State */}
-            <select
-              value={selectedState}
-              onChange={(e) => {
-                setSelectedState(e.target.value);
-                setSelectedDistrict('');
-                const firstMatching = parcels.find(p => p.location.state === e.target.value);
-                if (firstMatching) {
-                  setMapCenter(firstMatching.location.center);
-                  setMapZoom(12);
-                }
-              }}
-              className="px-2 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 shrink-0"
-            >
-              <option value="">{t('map.allStates')} ({states.length})</option>
-              {states.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
+          {/* Bottom Row: English Location Hierarchy Breadcrumb & Statistics */}
+          <div className="flex flex-wrap items-center justify-between text-[11px] bg-[#0a2540] px-3 py-1.5 rounded border border-slate-700 gap-2">
+            
+            {/* Location Hierarchy Breadcrumb */}
+            <div className="flex items-center space-x-1.5 text-slate-200">
+              <Globe className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="font-semibold text-white">India</span>
+              <span className="text-slate-400">›</span>
+              
+              <span className={selectedState ? "font-bold text-amber-300" : "text-slate-400"}>
+                {selectedState || "All States"}
+              </span>
+              <span className="text-slate-400">›</span>
 
-            {/* District */}
-            <select
-              value={selectedDistrict}
-              onChange={(e) => {
-                setSelectedDistrict(e.target.value);
-                const firstMatching = parcels.find(p => p.location.district === e.target.value);
-                if (firstMatching) {
-                  setMapCenter(firstMatching.location.center);
-                  setMapZoom(14);
-                }
-              }}
-              className="px-2 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 shrink-0"
-            >
-              <option value="">{t('map.allDistricts')} ({districts.length})</option>
-              {districts.map(d => <option key={d} value={d}>{d}</option>)}
-            </select>
+              <span className={selectedDistrict ? "font-bold text-amber-300" : "text-slate-400"}>
+                {selectedDistrict || "All Districts"}
+              </span>
+              <span className="text-slate-400">›</span>
 
-            {/* Land Use Filter */}
-            <select
-              value={selectedLandUse}
-              onChange={(e) => setSelectedLandUse(e.target.value)}
-              className="px-2 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 shrink-0"
-            >
-              <option value="All">{t('map.allLandUses')}</option>
-              <option value="Agricultural">Agricultural</option>
-              <option value="Commercial">Commercial</option>
-              <option value="Residential">Residential</option>
-              <option value="Industrial">Industrial</option>
-              <option value="Institutional">Institutional</option>
-              <option value="Protected / Government">Protected / Govt</option>
-            </select>
+              <span className={selectedTaluka ? "font-bold text-amber-300" : "text-slate-400"}>
+                {selectedTaluka || "All Blocks / Tehsils"}
+              </span>
+              <span className="text-slate-400">›</span>
 
-            {/* Title / Risk Filter */}
-            <select
-              value={selectedRiskFilter}
-              onChange={(e) => setSelectedRiskFilter(e.target.value)}
-              className="px-2 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 shrink-0"
-            >
-              <option value="All">{t('map.allTitleStatuses')}</option>
-              <option value="Clear">{t('map.clearOnly')}</option>
-              <option value="Stayed">{t('map.stayedOnly')}</option>
-            </select>
+              <span className={selectedVillage ? "font-bold text-amber-300" : "text-slate-400"}>
+                {selectedVillage || "All Villages"}
+              </span>
+            </div>
+
+            {/* Cadastral Count & Spatial Acreage */}
+            <div className="flex items-center space-x-3 text-slate-300 font-mono">
+              <div>
+                <span>Total Parcels: </span>
+                <span className="text-amber-400 font-bold">{filteredParcels.length}</span>
+              </div>
+              <span className="text-slate-500">|</span>
+              <div>
+                <span>Land Area: </span>
+                <span className="text-emerald-400 font-bold">{totalVisibleAcres} Acres</span>
+              </div>
+            </div>
+
           </div>
 
         </div>
       </div>
 
-      {/* Main Map Container */}
+      {/* 2. Main Leaflet GIS Map Container */}
       <div className="relative flex-1 w-full h-full">
         
         <MapContainer
@@ -330,12 +536,41 @@ export const MapView = () => {
             url={tileUrls[baseTile].url}
           />
 
-          {/* Render GeoJSON Cadastral Parcels */}
+          {/* Live User GPS Location Indicator */}
+          {userLocation && (
+            <>
+              <Circle
+                center={[userLocation.lat, userLocation.lng]}
+                radius={userLocation.accuracy || 100}
+                pathOptions={{
+                  color: '#3b82f6',
+                  fillColor: '#3b82f6',
+                  fillOpacity: 0.15,
+                  weight: 1
+                }}
+              />
+              <Marker position={[userLocation.lat, userLocation.lng]}>
+                <Popup>
+                  <div className="text-xs font-sans p-1">
+                    <div className="font-bold text-blue-700 flex items-center gap-1">
+                      <Navigation className="w-3.5 h-3.5" />
+                      <span>Your Live GPS Position</span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 mt-1 font-mono">
+                      Lat: {userLocation.lat.toFixed(5)}, Lng: {userLocation.lng.toFixed(5)}
+                    </p>
+                  </div>
+                </Popup>
+              </Marker>
+            </>
+          )}
+
+          {/* Render Cadastral Parcel Polygons */}
           {filteredParcels.map((parcel) => {
             const coords = getLeafletCoords(parcel.geometry);
             const isSelected = activeParcel?.ulpin === parcel.ulpin;
-            const landUseBadge = getLandUseBadge(parcel.landUseCategory);
             const isStayed = parcel.litigation?.hasLitigation;
+            const loc = parcel.location || {};
 
             return (
               <React.Fragment key={parcel.ulpin}>
@@ -343,9 +578,9 @@ export const MapView = () => {
                 <Polygon
                   positions={coords}
                   pathOptions={{
-                    color: isSelected ? '#10B981' : isStayed ? '#DC2626' : parcel.colorCode || '#2563EB',
-                    fillColor: isStayed ? '#DC2626' : parcel.colorCode || '#2563EB',
-                    fillOpacity: isSelected ? 0.75 : layerOpacity,
+                    color: isSelected ? '#d97706' : isStayed ? '#b91c1c' : parcel.colorCode || '#103b66',
+                    fillColor: isStayed ? '#dc2626' : parcel.colorCode || '#103b66',
+                    fillOpacity: isSelected ? 0.85 : layerOpacity,
                     weight: isSelected ? 4 : 2,
                     dashArray: isStayed ? '5, 5' : null
                   }}
@@ -354,38 +589,46 @@ export const MapView = () => {
                   }}
                 >
                   <Tooltip sticky direction="top" className="custom-map-tooltip">
-                    <div className="text-xs font-sans p-1">
-                      <div className="font-bold text-slate-900 flex items-center gap-1 font-mono">
+                    <div className="text-xs p-1.5 max-w-xs font-sans">
+                      <div className="font-bold text-[#103b66] font-mono text-xs flex items-center justify-between gap-2 border-b pb-1 mb-1">
                         <span>{parcel.ulpin}</span>
-                        {isStayed && <span className="text-red-600 font-bold">[STAY]</span>}
+                        {isStayed && <span className="text-red-700 font-bold">[COURT STAY]</span>}
                       </div>
-                      <div className="text-[11px] text-slate-700">
-                        Survey: {parcel.surveyNo} • {parcel.landUseCategory}
+                      <div className="text-[11px] text-slate-800 font-medium">
+                        Owner: {parcel.revenueRecords?.owners?.[0]?.name || 'N/A'}
                       </div>
-                      <div className="text-[10px] text-slate-500">
-                        Area: {parcel.spatialAttributes?.areaAcres} Acres ({parcel.location.village})
+                      <div className="text-[10px] text-slate-600 mt-0.5">
+                        Survey / Khasra: {parcel.surveyNo || parcel.khasraNo} • {parcel.landUseCategory}
+                      </div>
+                      <div className="text-[10px] text-slate-500 mt-0.5">
+                        Location: {loc.village}, {loc.taluka}, {loc.district}, {loc.state}
+                      </div>
+                      <div className="text-[10px] text-[#103b66] font-bold mt-1">
+                        Area: {parcel.spatialAttributes?.areaAcres} Acres ({parcel.spatialAttributes?.areaHectares} Ha)
                       </div>
                     </div>
                   </Tooltip>
                 </Polygon>
 
-                {/* Center Marker */}
-                {parcel.location?.center && (
+                {/* Marker at Parcel Center */}
+                {loc.center && (
                   <Marker
-                    position={parcel.location.center}
+                    position={loc.center}
                     eventHandlers={{
                       click: () => handleParcelClick(parcel)
                     }}
                   >
                     <Popup className="custom-map-popup">
-                      <div className="text-xs p-1">
-                        <div className="font-bold text-slate-900 font-mono">{parcel.ulpin}</div>
-                        <div className="text-[11px] text-slate-700">{parcel.revenueRecords?.owners?.[0]?.name}</div>
+                      <div className="text-xs p-1 font-sans">
+                        <div className="font-bold text-[#103b66] font-mono border-b pb-1">{parcel.ulpin}</div>
+                        <div className="text-[11px] text-slate-800 font-bold mt-1">{parcel.revenueRecords?.owners?.[0]?.name}</div>
+                        <div className="text-[10px] text-slate-600 mt-0.5">{loc.village}, {loc.taluka}, {loc.district}, {loc.state}</div>
+                        <div className="text-[10px] text-slate-600 mt-0.5 font-semibold">Survey: {parcel.surveyNo} • {parcel.spatialAttributes?.areaAcres} Acres</div>
                         <button
                           onClick={() => handleParcelClick(parcel)}
-                          className="mt-2 w-full py-1 bg-emerald-600 text-white rounded text-[11px] font-bold"
+                          className="mt-2 w-full py-1 bg-[#103b66] hover:bg-[#0a2540] text-white rounded text-[11px] font-bold transition-colors"
                         >
-                          View Quick Card
+                          View Official Land Dossier
                         </button>
                       </div>
                     </Popup>
@@ -395,14 +638,14 @@ export const MapView = () => {
             );
           })}
 
-          {/* Render Active Measurement Polygon */}
+          {/* Measure Polygon */}
           {measurePoints.length > 0 && (
             <Polygon
               positions={measurePoints}
               pathOptions={{
-                color: '#EC4899',
-                fillColor: '#EC4899',
-                fillOpacity: 0.3,
+                color: '#d97706',
+                fillColor: '#d97706',
+                fillOpacity: 0.35,
                 weight: 2,
                 dashArray: '4, 4'
               }}
@@ -413,48 +656,48 @@ export const MapView = () => {
         {/* Floating Map Controls (Top Right) */}
         <div className="absolute top-4 right-4 z-[999] flex flex-col space-y-2">
           
-          {/* Tile Layer Switcher */}
-          <div className="bg-slate-900/90 backdrop-blur border border-slate-700 rounded-xl p-1.5 shadow-xl flex flex-col space-y-1 text-xs">
-            <span className="text-[10px] font-bold text-slate-400 px-2 py-0.5 uppercase tracking-wider">
-              Basemap
+          {/* Basemap Switcher */}
+          <div className="gov-card p-2 text-xs shadow-lg bg-white/95 backdrop-blur-sm">
+            <span className="text-[10px] font-bold text-slate-500 block uppercase mb-1">
+              Basemap Layer
             </span>
             <div className="grid grid-cols-3 gap-1">
               <button
-                onClick={() => setBaseTile('cartoDark')}
-                className={`px-2 py-1 rounded text-[11px] font-medium transition-colors ${
-                  baseTile === 'cartoDark' ? 'bg-emerald-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300 hover:text-white'
+                onClick={() => setBaseTile('osm')}
+                className={`px-2 py-1 rounded text-[11px] font-bold transition-colors ${
+                  baseTile === 'osm' ? 'bg-[#103b66] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                Standard
+                OSM Map
               </button>
               <button
                 onClick={() => setBaseTile('satellite')}
-                className={`px-2 py-1 rounded text-[11px] font-medium transition-colors ${
-                  baseTile === 'satellite' ? 'bg-emerald-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300 hover:text-white'
+                className={`px-2 py-1 rounded text-[11px] font-bold transition-colors ${
+                  baseTile === 'satellite' ? 'bg-[#103b66] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
                 Satellite
               </button>
               <button
-                onClick={() => setBaseTile('osm')}
-                className={`px-2 py-1 rounded text-[11px] font-medium transition-colors ${
-                  baseTile === 'osm' ? 'bg-emerald-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300 hover:text-white'
+                onClick={() => setBaseTile('topo')}
+                className={`px-2 py-1 rounded text-[11px] font-bold transition-colors ${
+                  baseTile === 'topo' ? 'bg-[#103b66] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                OSM
+                Topo Map
               </button>
             </div>
           </div>
 
-          {/* Quick Action Tools */}
-          <div className="bg-slate-900/90 backdrop-blur border border-slate-700 rounded-xl p-1.5 shadow-xl flex flex-col space-y-1">
+          {/* Zoom & Measure Tools */}
+          <div className="gov-card p-2 text-xs shadow-lg bg-white/95 backdrop-blur-sm flex flex-col space-y-1">
             <button
               onClick={handleZoomToAll}
-              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white flex items-center space-x-2 text-xs transition-colors"
-              title="Zoom to Extent of all Visible Parcels"
+              className="gov-btn-secondary py-1 text-[11px] justify-start"
+              title="Zoom to Extent of all Filtered Parcels"
             >
-              <Maximize2 className="w-4 h-4 text-emerald-400" />
-              <span>Zoom to Fit All</span>
+              <Maximize2 className="w-3.5 h-3.5 text-[#103b66]" />
+              <span>Zoom All Parcels</span>
             </button>
 
             <button
@@ -462,23 +705,20 @@ export const MapView = () => {
                 setIsMeasuring(!isMeasuring);
                 setMeasurePoints([]);
               }}
-              className={`p-2 rounded-lg flex items-center space-x-2 text-xs transition-colors ${
-                isMeasuring 
-                  ? 'bg-pink-500/20 text-pink-300 border border-pink-500/40' 
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white'
+              className={`py-1 px-2 rounded text-[11px] font-bold flex items-center gap-1.5 transition-colors ${
+                isMeasuring ? 'bg-amber-100 text-amber-900 border border-amber-400' : 'gov-btn-secondary justify-start'
               }`}
-              title="Click on map vertices to calculate custom area"
             >
-              <Ruler className="w-4 h-4 text-pink-400" />
-              <span>{isMeasuring ? 'Exit Measure' : 'Measure Area'}</span>
+              <Ruler className="w-3.5 h-3.5 text-amber-700" />
+              <span>{isMeasuring ? 'Exit Measurement' : 'Measure Area'}</span>
             </button>
           </div>
 
-          {/* Opacity Slider */}
-          <div className="bg-slate-900/90 backdrop-blur border border-slate-700 rounded-xl p-2.5 shadow-xl text-xs text-slate-300">
+          {/* Boundary Opacity Control */}
+          <div className="gov-card p-2 text-xs shadow-lg bg-white/95 backdrop-blur-sm">
             <div className="flex justify-between items-center mb-1 text-[11px]">
-              <span className="text-slate-400">Cadastre Opacity:</span>
-              <span className="font-mono font-bold text-emerald-400">{Math.round(layerOpacity * 100)}%</span>
+              <span className="text-slate-600 font-semibold">Boundary Opacity:</span>
+              <span className="font-mono font-bold text-[#103b66]">{Math.round(layerOpacity * 100)}%</span>
             </div>
             <input
               type="range"
@@ -487,71 +727,46 @@ export const MapView = () => {
               step="0.05"
               value={layerOpacity}
               onChange={(e) => setLayerOpacity(parseFloat(e.target.value))}
-              className="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-700 rounded-lg"
+              className="w-full accent-[#103b66] cursor-pointer h-1.5 bg-slate-200 rounded"
             />
           </div>
         </div>
 
-        {/* Measurement Info Floating Box (if active) */}
-        {isMeasuring && (
-          <div className="absolute top-4 left-4 z-[999] bg-slate-900/95 border border-pink-500/50 rounded-xl p-3 shadow-2xl text-xs text-slate-200 max-w-xs">
-            <div className="flex items-center space-x-2 text-pink-400 font-bold mb-1">
-              <Ruler className="w-4 h-4" />
-              <span>DGPS Area Measure Mode</span>
-            </div>
-            <p className="text-[11px] text-slate-400">
-              Click 3 or more points on the GIS map to define a custom polygon boundary.
-            </p>
-            {measurePoints.length > 0 && (
-              <div className="mt-2 pt-2 border-t border-slate-800 space-y-1">
-                <div className="text-[11px]">Points Placed: <strong className="text-white">{measurePoints.length}</strong></div>
-                {calculatedMeasureArea && (
-                  <div className="bg-pink-950/40 p-1.5 rounded border border-pink-500/30 text-[11px] font-mono text-pink-300">
-                    Area: <strong>{calculatedMeasureArea.acres} Acres</strong> ({calculatedMeasureArea.sqm.toLocaleString()} sq.m)
-                  </div>
-                )}
-                <button
-                  onClick={() => setMeasurePoints([])}
-                  className="mt-1 px-2 py-0.5 bg-slate-800 text-slate-300 hover:text-white rounded text-[10px]"
-                >
-                  Clear Points
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Map Legend (Bottom Right) */}
-        <div className="absolute bottom-4 right-4 z-[999] bg-slate-900/90 backdrop-blur border border-slate-800 rounded-xl p-3 shadow-2xl text-xs max-w-xs hidden sm:block">
-          <div className="font-bold text-white text-xs mb-2 flex items-center space-x-1.5">
-            <Layers className="w-3.5 h-3.5 text-emerald-400" />
-            <span>GIS Cadastre Legend</span>
+        {/* English GIS Cadastral Layer Legend (Bottom Right) */}
+        <div className="absolute bottom-4 right-4 z-[999] gov-card p-3 shadow-lg text-xs max-w-xs hidden sm:block bg-white/95 backdrop-blur-sm">
+          <div className="font-bold text-[#103b66] text-xs mb-2 flex items-center space-x-1.5 border-b border-slate-200 pb-1">
+            <Layers className="w-3.5 h-3.5 text-amber-600" />
+            <span>GIS Cadastral Layer Legend</span>
           </div>
           <div className="space-y-1.5 text-[11px]">
             <div className="flex items-center space-x-2">
-              <span className="w-3 h-3 rounded bg-emerald-600 border border-emerald-400"></span>
-              <span className="text-slate-300">Agricultural Cadastre</span>
+              <span className="w-3 h-3 rounded bg-emerald-700"></span>
+              <span className="text-slate-800 font-medium">Agricultural Land</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="w-3 h-3 rounded bg-blue-600 border border-blue-400"></span>
-              <span className="text-slate-300">Commercial / Tech Park</span>
+              <span className="w-3 h-3 rounded bg-blue-700"></span>
+              <span className="text-slate-800 font-medium">Commercial Zone</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="w-3 h-3 rounded bg-amber-500 border border-amber-400"></span>
-              <span className="text-slate-300">Residential Plotted / Group Housing</span>
+              <span className="w-3 h-3 rounded bg-amber-600"></span>
+              <span className="text-slate-800 font-medium">Residential Zone</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="w-3 h-3 rounded bg-purple-600 border border-purple-400"></span>
-              <span className="text-slate-300">Industrial Manufacturing (GIDC)</span>
+              <span className="w-3 h-3 rounded bg-purple-700"></span>
+              <span className="text-slate-800 font-medium">Industrial Zone (GIDC / MIDC)</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="w-3 h-3 rounded bg-red-600 border border-red-400 border-dashed"></span>
-              <span className="text-red-400 font-semibold">Active Court Stay / Locked</span>
+              <span className="w-3 h-3 rounded bg-indigo-700"></span>
+              <span className="text-slate-800 font-medium">Institutional Campus</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="w-3 h-3 rounded bg-red-600 border border-red-800 border-dashed"></span>
+              <span className="text-red-700 font-bold">Court Stay / Litigation Flagged</span>
             </div>
           </div>
         </div>
 
-        {/* Active Parcel Modal Card (Bottom Left) */}
+        {/* Selected Parcel Full Info Card Modal (Bottom Left) */}
         {activeParcel && (
           <MapParcelModal
             parcel={activeParcel}

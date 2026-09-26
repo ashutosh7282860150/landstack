@@ -55,10 +55,10 @@ export const TRANSLATIONS = {
     },
     features: {
       tag: 'Digital Public Infrastructure (DPI)',
-      title: 'What is LAND STACK?',
-      description: 'LAND STACK is a unified, parcel-centric Digital Public Infrastructure designed to eliminate fragmented land administration. Instead of maintaining disconnected records across revenue departments, registration offices, municipal town planning bodies, banks, and courts, LAND STACK anchors all land-related data directly to the physical land parcel via a 14-digit Unique Land Parcel Identification Number (ULPIN / Bhu-Aadhaar).',
+      title: 'What is BHOO BHUMI?',
+      description: 'BHOO BHUMI is a unified, parcel-centric Digital Public Infrastructure designed to eliminate fragmented land administration. Instead of maintaining disconnected records across revenue departments, registration offices, municipal town planning bodies, banks, and courts, BHOO BHUMI anchors all land-related data directly to the physical land parcel via a 14-digit Unique Land Parcel Identification Number (ULPIN / Bhu-Aadhaar).',
       registriesTitle: '8 Synchronized Departmental Registries',
-      workflowTitle: 'How LAND STACK Works (4-Step DPI Pipeline)'
+      workflowTitle: 'How BHOO BHUMI Works (4-Step DPI Pipeline)'
     },
     map: {
       searchPlaceholder: 'Search ULPIN, Survey No, Owner, Village...',
@@ -124,7 +124,7 @@ export const TRANSLATIONS = {
       close: 'Close'
     },
     chatbot: {
-      welcome: 'Hello! 👋 I am your LAND STACK DPI AI Assistant. Ask me anything about land records, ULPIN, Bhu-Aadhaar, digital mutations, property taxes, or legal title verification.',
+      welcome: 'Hello! 👋 I am your BHOO BHUMI DPI AI Assistant. Ask me anything about land records, ULPIN, Bhu-Aadhaar, digital mutations, property taxes, or legal title verification.',
       placeholder: 'Ask a question about land governance or ULPIN...',
       send: 'Send',
       quickTitle: 'Frequently Asked Questions:'
@@ -255,7 +255,7 @@ export const TRANSLATIONS = {
       close: 'बंद करें'
     },
     chatbot: {
-      welcome: 'नमस्ते! 👋 मैं आपका लैंड स्टैक (LAND STACK) एआई सहायक हूँ। भूमि रिकॉर्ड, यूएलपिन, भू-आधार, नामांतरण (म्यूटेशन), या संपत्ति कर के बारे में कुछ भी पूछें।',
+      welcome: 'नमस्ते! 👋 मैं आपका भू भूमि (BHOO BHUMI) एआई सहायक हूँ। भूमि रिकॉर्ड, यूएलपिन, भू-आधार, नामांतरण (म्यूटेशन), या संपत्ति कर के बारे में कुछ भी पूछें।',
       placeholder: 'भूमि शासन या यूएलपिन के बारे में प्रश्न पूछें...',
       send: 'भेजें',
       quickTitle: 'अक्सर पूछे जाने वाले प्रश्न:'

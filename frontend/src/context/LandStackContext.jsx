@@ -13,12 +13,35 @@ export const ROLES = [
 ];
 
 export const LandStackProvider = ({ children }) => {
-  const [currentRole, setCurrentRole] = useState(ROLES[0]);
-  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'map' | 'dossier' | 'services' | 'tracker' | 'officer_workflow' | 'admin' | 'compare'
+  // User Authentication State
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('landstack_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [currentRole, setCurrentRole] = useState(() => {
+    try {
+      const saved = localStorage.getItem('landstack_user');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const matched = ROLES.find(r => r.id === parsed.role);
+        if (matched) return matched;
+      }
+    } catch {
+      // fallback
+    }
+    return ROLES[0];
+  });
+
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'map' | 'dossier' | 'services' | 'tracker' | 'officer_workflow' | 'admin'
   const [dossierSubTab, setDossierSubTab] = useState('overview');
   
   // Theme & Language State
-  const [theme, setTheme] = useState(() => localStorage.getItem('landstack_theme') || 'dark'); // 'dark' | 'light' | 'night'
+  const [theme, setTheme] = useState(() => localStorage.getItem('landstack_theme') || 'light'); // 'dark' | 'light' | 'night'
   const [language, setLanguage] = useState(() => localStorage.getItem('landstack_lang') || 'en'); // 'en' | 'hi' | 'mr' | 'gu' | 'ta'
 
   // Apply theme to HTML root element
@@ -26,15 +49,15 @@ export const LandStackProvider = ({ children }) => {
     localStorage.setItem('landstack_theme', theme);
     document.documentElement.classList.remove('theme-dark', 'theme-light', 'theme-night');
     document.documentElement.classList.add(`theme-${theme}`);
-    if (theme === 'light') {
-      document.body.style.backgroundColor = '#f8fafc';
-      document.body.style.color = '#0f172a';
+    if (theme === 'dark') {
+      document.body.style.backgroundColor = '#020617';
+      document.body.style.color = '#f8fafc';
     } else if (theme === 'night') {
       document.body.style.backgroundColor = '#030712';
       document.body.style.color = '#f9fafb';
     } else {
-      document.body.style.backgroundColor = '#020617';
-      document.body.style.color = '#f8fafc';
+      document.body.style.backgroundColor = '#f4f6f9';
+      document.body.style.color = '#1f2937';
     }
   }, [theme]);
 
@@ -79,19 +102,9 @@ export const LandStackProvider = ({ children }) => {
   const [auditLogs, setAuditLogs] = useState([]);
   const [compareList, setCompareList] = useState([]);
 
-  // User Authentication State
-  const [currentUser, setCurrentUser] = useState(() => {
-    try {
-      const saved = localStorage.getItem('landstack_user');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
+  // Modals & Chatbot State
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('login'); // 'login' | 'register'
-
-  // Modals & Chatbot State
   const [isBhuAadhaarModalOpen, setIsBhuAadhaarModalOpen] = useState(false);
   const [isQRVerifyModalOpen, setIsQRVerifyModalOpen] = useState(false);
   const [isMutationModalOpen, setIsMutationModalOpen] = useState(false);
@@ -107,17 +120,62 @@ export const LandStackProvider = ({ children }) => {
     setTimeout(() => setToast(null), 4000);
   };
 
+  // Role verification helper
+  const isOfficerOrAdmin = Boolean(
+    currentUser && (
+      currentUser.role === 'revenue_officer' || 
+      currentUser.role === 'sub_registrar' || 
+      currentUser.role === 'municipal_officer' || 
+      currentUser.role === 'admin'
+    )
+  );
+
+  const isCitizen = Boolean(currentUser && currentUser.role === 'citizen');
+
+  // Permission Guard for Tab Navigation
+  const handleTabChange = (tabId) => {
+    if (!currentUser && tabId !== 'home') {
+      showToast('Please log in through the SSO Gateway to access portal services.', 'info');
+      setActiveTab('home');
+      return;
+    }
+
+    if (currentUser?.role === 'citizen') {
+      if (tabId === 'officer_workflow' || tabId === 'admin') {
+        showToast('Access Denied: Citizens are not permitted to access Officer/Admin portals.', 'error');
+        return;
+      }
+    }
+
+    setActiveTab(tabId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const loginUser = (userData) => {
     setCurrentUser(userData);
     localStorage.setItem('landstack_user', JSON.stringify(userData));
     setIsAuthModalOpen(false);
-    showToast(`Welcome, ${userData.name}! Successfully authenticated.`, 'success');
+
+    const matchedRole = ROLES.find(r => r.id === userData.role) || ROLES[0];
+    setCurrentRole(matchedRole);
+
+    if (userData.role === 'revenue_officer' || userData.role === 'sub_registrar' || userData.role === 'municipal_officer') {
+      setActiveTab('officer_workflow');
+    } else if (userData.role === 'admin') {
+      setActiveTab('admin');
+    } else {
+      setActiveTab('home');
+    }
+
+    showToast(`Welcome, ${userData.name}! Successfully authenticated to BHOO BHUMI.`, 'success');
   };
 
   const logoutUser = () => {
     setCurrentUser(null);
+    setCurrentRole(ROLES[0]);
     localStorage.removeItem('landstack_user');
-    showToast('You have been logged out.', 'info');
+    setActiveTab('home');
+    showToast('You have been logged out. SSO Gateway active.', 'info');
   };
 
   // Load Data
@@ -152,6 +210,11 @@ export const LandStackProvider = ({ children }) => {
   }, []);
 
   const selectParcel = (parcel, targetDossierTab = 'overview') => {
+    if (!currentUser) {
+      showToast('Please sign in to inspect land parcels.', 'info');
+      setActiveTab('home');
+      return;
+    }
     setSelectedParcel(parcel);
     setDossierSubTab(targetDossierTab);
     setActiveTab('dossier');
@@ -159,6 +222,11 @@ export const LandStackProvider = ({ children }) => {
   };
 
   const selectParcelByUlpin = async (ulpin, targetDossierTab = 'overview') => {
+    if (!currentUser) {
+      showToast('Please sign in to search and inspect land parcels.', 'info');
+      setActiveTab('home');
+      return false;
+    }
     const found = parcels.find(p => p.ulpin.toLowerCase() === ulpin.toLowerCase() || p.bhuAadhaar.toLowerCase() === ulpin.toLowerCase());
     if (found) {
       selectParcel(found, targetDossierTab);
@@ -237,7 +305,7 @@ export const LandStackProvider = ({ children }) => {
       currentRole,
       setCurrentRole,
       activeTab,
-      setActiveTab,
+      setActiveTab: handleTabChange,
       dossierSubTab,
       setDossierSubTab,
       parcels,
@@ -285,6 +353,8 @@ export const LandStackProvider = ({ children }) => {
       setAuthModalMode,
       loginUser,
       logoutUser,
+      isOfficerOrAdmin,
+      isCitizen,
       toast,
       showToast
     }}>
